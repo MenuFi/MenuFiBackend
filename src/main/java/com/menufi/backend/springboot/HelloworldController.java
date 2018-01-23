@@ -18,10 +18,49 @@ package com.menufi.backend.springboot;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.*;
+import java.util.Map;
+
 @RestController
 public class HelloworldController {
-  @GetMapping("/")
-  public String hello() {
-    return "Hello world - springboot-appengine-standard!";
-  }
+    Connection conn;
+    boolean initialized = false;
+
+    @GetMapping("/")
+    public String hello() {
+        return response;
+    }
+
+    public String sqlTest() {
+        if (!initialized) {
+            initConnection();
+            initialized = true;
+        }
+        String response = "No Response";
+        String query = "SELECT * FROM patron_login;";
+        try {
+            ResultSet rs = conn.prepareStatement(query).executeQuery();
+            rs.next();
+            response = rs.getString("email");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return response;
+    }
+
+    public void initConnection() {
+        try {
+            ApiProxy.Environment env = ApiProxy.getCurrentEnvironment();
+            Map<String,Object> attr = env.getAttributes();
+            String hostname = (String) attr.get("com.google.appengine.runtime.default_version_hostname");
+
+            String url = hostname.contains("localhost:")
+                    ? System.getProperty("cloudsql-local") : System.getProperty("cloudsql");
+            conn = DriverManager.getConnection(url);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+
+    }
 }

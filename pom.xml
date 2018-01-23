@@ -22,6 +22,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
+
+        <INSTANCE_CONNECTION_NAME>menufi-192821:us-east1:menufi</INSTANCE_CONNECTION_NAME>
+        <user>root</user>
+        <password>team7309</password>
+        <database>menufi</database>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
 
 	<dependencies>
@@ -55,6 +62,19 @@
 	      <version>1.5.9.RELEASE</version>
 	      <scope>test</scope>
 	    </dependency>
+
+        <dependency> <!-- Only used locally -->
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.42</version>  <!-- v5.x.x is for production, v6.x.x EAP X DevAPI -->
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.cloud.sql</groupId>
+            <!-- If using MySQL 6.x driver, use mysql-socket-factory-connector-j-6 instead -->
+            <artifactId>mysql-socket-factory</artifactId>
+            <version>1.0.5</version>
+        </dependency>
 
 	</dependencies>
 
