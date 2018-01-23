@@ -11,9 +11,8 @@ public class MenuController {
 
     private MenuService menuService;
 
-    @Autowired
-    public MenuController(MenuService menuService) {
-        this.menuService = menuService;
+    public MenuController() {
+        this.menuService = new MenuService();
     }
 
     @CrossOrigin

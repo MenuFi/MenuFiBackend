@@ -10,8 +10,7 @@ public class LoginController {
 
     private LoginService loginService;
 
-    @Autowired
-    public LoginController(LoginService loginService) {
-        this.loginService = loginService;
+    public LoginController() {
+        this.loginService = new LoginService();
     }
 }
