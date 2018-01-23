@@ -1,6 +1,8 @@
 package com.menufi.backend.sql;
 
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -13,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Service
+@Scope(value= ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class CloudSqlQuerier implements Querier {
     private static Logger logger = Logger.getLogger("SqlLogger");
     private static boolean initialized = false;
