@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IdeaProjects-MenuFiBackend.iml" filepath="$PROJECT_DIR$/.idea/modules/IdeaProjects-MenuFiBackend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MenuFiBackend.iml" filepath="$PROJECT_DIR$/.idea/modules/MenuFiBackend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MenuFiBackend.iml" filepath="$PROJECT_DIR$/MenuFiBackend.iml" />
     </modules>
   </component>
 </project>
