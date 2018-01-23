@@ -5,12 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class LoginService {
 
-    private Querier querier;
-
     @Autowired
-    public LoginService(Querier querier) {
-        this.querier = querier;
-    }
+    private Querier querier;
 
     public String loginUser(String username, String password) {
         throw new UnsupportedOperationException();

@@ -7,12 +7,8 @@ import java.util.Collection;
 
 public class RestaurantService {
 
-    private Querier querier;
-
     @Autowired
-    public RestaurantService(Querier querier) {
-        this.querier = querier;
-    }
+    private Querier querier;
 
     public Collection<Restaurant> getNearbyRestaurants(String location) {
         throw new UnsupportedOperationException();

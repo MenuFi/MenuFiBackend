@@ -7,12 +7,8 @@ import java.util.Collection;
 
 public class MenuService {
 
-    private Querier querier;
-
     @Autowired
-    public MenuService(Querier querier) {
-        this.querier = querier;
-    }
+    private Querier querier;
 
     public MenuItem addMenuItem(AddMenuItemRequest addMenuItemRequest) {
         throw new UnsupportedOperationException();
