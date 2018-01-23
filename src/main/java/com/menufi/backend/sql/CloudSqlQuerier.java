@@ -26,7 +26,7 @@ public class CloudSqlQuerier implements Querier {
     }
 
     @Override
-    public Map<String, String> query(String table, List<String> columns, Map<String, String> where) {
+    public List<Map<String, String>> query(String table, List<String> columns, Map<String, String> where) {
         return null;
     }
 
