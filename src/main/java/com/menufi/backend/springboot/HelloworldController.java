@@ -1,13 +1,11 @@
 package com.menufi.backend.springboot;
 
 import com.menufi.backend.sql.CloudSqlQuerier;
-import com.menufi.backend.sql.SqlQuerier;
+import com.menufi.backend.sql.Querier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @RestController
 public class HelloworldController {
@@ -18,7 +16,7 @@ public class HelloworldController {
 
     private String sqlTest() {
         String query = "SELECT * FROM patron_login;";
-        SqlQuerier querier = CloudSqlQuerier.getSqlQuerier();
+        Querier querier = CloudSqlQuerier.getSqlQuerier();
         ResultSet rs = querier.rawQuery(query);
         try {
             rs.next();

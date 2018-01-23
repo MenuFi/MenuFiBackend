@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 
-public interface SqlQuerier {
+public interface Querier {
 
     Map<String, String> query(String table, List<String> columns, Map<String, String> where);
     @Deprecated

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class CloudSqlQuerier implements SqlQuerier {
+public class CloudSqlQuerier implements Querier {
     private static Logger logger = Logger.getLogger("SqlLogger");
     private static boolean initialized = false;
     private static CloudSqlQuerier querier;
