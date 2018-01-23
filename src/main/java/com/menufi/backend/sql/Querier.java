@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface Querier {
 
-    Map<String, String> query(String table, List<String> columns, Map<String, String> where);
+    List<Map<String, String>> query(String table, List<String> columns, Map<String, String> where);
     @Deprecated
     ResultSet rawQuery(String query);
     boolean insert(String table, Map<String, String> values);
