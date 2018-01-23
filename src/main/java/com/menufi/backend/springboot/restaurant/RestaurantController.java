@@ -13,9 +13,8 @@ public class RestaurantController {
 
     private RestaurantService restaurantService;
 
-    @Autowired
-    public RestaurantController(RestaurantService restaurantService) {
-        this.restaurantService = restaurantService;
+    public RestaurantController() {
+        this.restaurantService = new RestaurantService();
     }
 
     @CrossOrigin

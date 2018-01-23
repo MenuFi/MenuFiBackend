@@ -1,5 +1,8 @@
 package com.menufi.backend.sql;
 
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -9,6 +12,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Service
 public class CloudSqlQuerier implements Querier {
     private static Logger logger = Logger.getLogger("SqlLogger");
     private static boolean initialized = false;
