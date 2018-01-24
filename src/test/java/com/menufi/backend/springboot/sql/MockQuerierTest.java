@@ -70,6 +70,5 @@ public class MockQuerierTest {
         List<Map<String, String>> result = querier.query(table1, null);
         List<Map<String, String>> expected = ImmutableList.of(updatedEntry, entry2);
         assertEquals(expected, result);
-
     }
 }

@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.menufi.backend.springboot.sql.CloudSqlQuerier;
 import com.menufi.backend.springboot.sql.MockQuerier;
 import com.menufi.backend.springboot.sql.Querier;
+import com.menufi.backend.springboot.sql.SqlUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,8 +28,10 @@ public class HelloworldController {
             return result.get(0).get("name");
         } else {
             Querier querier = CloudSqlQuerier.getSqlQuerier();
-            List<Map<String,String>> result = querier.query("patron_login", null);
-            return result.get(0).get("Email");
+            List<Map<String,String>> result1 = querier.query("patron_login", null);
+            List<Map<String,String>> result2 = querier.query("patron_login", ImmutableList.of("Email"));
+            System.out.println(SqlUtil.queryResultsToString(result));
+            return SqlUtil.queryResultsToString(result);
         }
     }
 }
