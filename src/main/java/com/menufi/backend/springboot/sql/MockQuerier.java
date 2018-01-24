@@ -1,5 +1,7 @@
 package com.menufi.backend.springboot.sql;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,7 +76,7 @@ public class MockQuerier implements Querier {
         if (!db.containsKey(table)) {
             db.put(table, new ArrayList<>());
         }
-        db.get(table).add(values);
+        db.get(table).add(new HashMap<>(values));
         return true;
     }
 
@@ -85,6 +87,27 @@ public class MockQuerier implements Querier {
 
     @Override
     public boolean update(String table, Map<String, String> updates, Map<String, String> where) {
-        throw new UnsupportedOperationException();
+        List<Map<String, String>> dbTable = db.get(table);
+        for (Map<String, String> entry : dbTable) {
+            if (entryMatchesWhere(entry, where)) {
+                mergeMaps(entry, updates);
+            }
+        }
+        return true;
+    }
+
+    private void mergeMaps(Map<String, String> first, Map<String, String> second) {
+        for (String col : second.keySet()) {
+            first.put(col, second.get(col));
+        }
+    }
+
+    private boolean entryMatchesWhere(Map<String, String> entry, Map<String, String> where) {
+        for (String col : where.keySet()) {
+            if (!entry.containsKey(col) || !where.get(col).equals(entry.get(col))){
+                return false;
+            }
+        }
+        return true;
     }
 }

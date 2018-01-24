@@ -59,4 +59,17 @@ public class MockQuerierTest {
         List<Map<String, String>> result = querier.query(table1, ImmutableList.of(col1));
         assertEquals(expected, result);
     }
+
+    @Test
+    public void testUpdate() {
+        String updateValue = "Charles";
+        Map<String, String> updatedEntry = ImmutableMap.of(col1, updateValue, col2, col2val1);
+        Map<String, String> updates = ImmutableMap.of(col1, updateValue);
+        Map<String, String> where = ImmutableMap.of(col2, col2val1);
+        querier.update(table1, updates, where);
+        List<Map<String, String>> result = querier.query(table1, null);
+        List<Map<String, String>> expected = ImmutableList.of(updatedEntry, entry2);
+        assertEquals(expected, result);
+
+    }
 }
