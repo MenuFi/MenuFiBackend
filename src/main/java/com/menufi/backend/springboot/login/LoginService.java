@@ -83,7 +83,7 @@ public class LoginService {
 
         Map<String, String> where = new HashMap<>();
         where.put("Username", username);
-        List<Map<String, String>> result = querier.query(table, columns, where);
+        List<Map<String, String>> result = querier.queryWhere(table, columns, where);
 
         if (!result.isEmpty()) {
             String resultPasswordHash = result.get(0).getOrDefault("PasswordHash", null);
@@ -103,7 +103,7 @@ public class LoginService {
 
         Map<String, String> where = new HashMap<>();
         where.put("Username", username);
-        List<Map<String, String>> result = querier.query(table, columns, where);
+        List<Map<String, String>> result = querier.queryWhere(table, columns, where);
 
         if (!result.isEmpty()) {
             throw new InvalidCredentialsException("Account already exists!");

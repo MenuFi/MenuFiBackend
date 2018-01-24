@@ -1,14 +1,13 @@
 package com.menufi.backend.sql;
 
+import com.google.common.base.Joiner;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -17,6 +16,10 @@ import java.util.logging.Logger;
 @Service
 @Scope(value= ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class CloudSqlQuerier implements Querier {
+    private static final String INSERT_FORMAT = "INSERT INTO %s (%s) VALUES (%s)";
+    private static final String SELECT_FORMAT = "SELECT %s FROM %s";
+    private static final String SELECT_WHERE_FORMAT = "SELECT %s FROM %s WHERE %s";
+
     private static Logger logger = Logger.getLogger("SqlLogger");
     private static boolean initialized = false;
     private static CloudSqlQuerier querier;
@@ -33,8 +36,42 @@ public class CloudSqlQuerier implements Querier {
     }
 
     @Override
-    public List<Map<String, String>> query(String table, List<String> columns, Map<String, String> where) {
-        return null;
+    public List<Map<String, String>> query(String table, List<String> columns) {
+        String columnString = columns == null ? "*" : Joiner.on(",").join(columns);
+        String query = String.format(SELECT_FORMAT, columnString, table);
+        return executeSelect(query);
+    }
+
+    @Override
+    public List<Map<String, String>> queryWhere(String table, List<String> columns, Map<String, String> where) {
+        List<String> whereConditionList = new ArrayList<>();
+        for (String colName: where.keySet()) {
+            whereConditionList.add(String.format("%s='%s'", colName, where.get(colName)));
+        }
+        String whereString = Joiner.on(" and ").join(whereConditionList);
+        String columnString = columns == null ? "*" : Joiner.on(",").join(columns);
+        String query = String.format(SELECT_WHERE_FORMAT, columnString, table, whereString);
+        return executeSelect(query);
+    }
+
+    private List<Map<String, String>> executeSelect(String query) {
+        List<Map<String, String>> result = new ArrayList<>();
+        try {
+            logger.info("Executing query: " + query);
+            ResultSet rs = conn.prepareStatement(query).executeQuery();
+            ResultSetMetaData md = rs.getMetaData();
+            while (rs.next()) {
+                HashMap<String, String> entry = new HashMap<>();
+                for (int i = 0; i < md.getColumnCount(); i++) {
+                    entry.put(md.getColumnName(i), rs.getString(i));
+                }
+            }
+        } catch (SQLException e) {
+            logger.severe("Unable to execute query: " + query);
+            logger.severe(e.getMessage());
+            return null;
+        }
+        return result;
     }
 
     @Override
@@ -50,12 +87,35 @@ public class CloudSqlQuerier implements Querier {
 
     @Override
     public boolean insert(String table, Map<String, String> values) {
-        return false;
+        List<String> colNamesList = new ArrayList<>();
+        List<String> colValuesList = new ArrayList<>();
+        for (String colName: values.keySet()) {
+            colNamesList.add(colName);
+            colValuesList.add(values.get(colName));
+        }
+        String colNames = Joiner.on(",").join(colNamesList);
+        String colValues = Joiner.on(",").join(colValuesList);
+        String query = String.format(INSERT_FORMAT, table, colNames, colValues);
+        try {
+            conn.prepareStatement(query).executeUpdate();
+        } catch (SQLException e) {
+            logger.severe("Error while executing insert statement: " + query);
+            logger.severe(e.getMessage());
+            return false;
+        }
+        return true;
     }
 
     @Override
     public boolean rawInsert(String query) {
-        return false;
+        try {
+            conn.prepareStatement(query).executeUpdate();
+        } catch (SQLException e) {
+            logger.severe("Error while executing sql insert statement");
+            logger.severe(e.getMessage());
+            return false;
+        }
+        return true;
     }
 
     private boolean initialize() {
