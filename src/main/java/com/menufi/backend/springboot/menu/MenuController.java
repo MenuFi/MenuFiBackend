@@ -9,11 +9,8 @@ import java.util.Collection;
 @RestController
 public class MenuController {
 
+    @Autowired
     private MenuService menuService;
-
-    public MenuController() {
-        this.menuService = new MenuService();
-    }
 
     @CrossOrigin
     @RequestMapping(method= RequestMethod.GET, value="/items")

@@ -11,11 +11,8 @@ import java.util.Collection;
 @RestController
 public class RestaurantController {
 
+    @Autowired
     private RestaurantService restaurantService;
-
-    public RestaurantController() {
-        this.restaurantService = new RestaurantService();
-    }
 
     @CrossOrigin
     @RequestMapping("/restaurants/nearby")

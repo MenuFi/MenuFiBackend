@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class LoginController {
 
+    @Autowired
     private LoginService loginService;
 
-    public LoginController() {
-        this.loginService = new LoginService();
-    }
 }

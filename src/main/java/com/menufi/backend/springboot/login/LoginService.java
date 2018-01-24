@@ -1,23 +1,23 @@
 package com.menufi.backend.springboot.login;
 
-import com.menufi.backend.sql.Querier;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.menufi.backend.springboot.sql.Querier;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class LoginService {
 
     private static final String PATRON_TABLE = "patron_login";
-    private static final List<String> PATRON_LOGIN_COLUMNS = Arrays.asList(
-            "PasswordHash"
-    );
-    private static final List<String> PATRON_REGISTER_COLUMNS = Arrays.asList(
-            "Username"
-    );
+    private static final List<String> PATRON_LOGIN_COLUMNS = ImmutableList.of("PasswordHash");
+
+    private static final List<String> PATRON_REGISTER_COLUMNS = ImmutableList.of("Username");
 
     private static final String RESTAURANT_TABLE = "restaurant_login";
     private static final List<String> RESTAURANT_LOGIN_COLUMNS = PATRON_LOGIN_COLUMNS;
@@ -81,8 +81,7 @@ public class LoginService {
             throw new BadCredentialsException("Incorrectly formatted username or password.");
         }
 
-        Map<String, String> where = new HashMap<>();
-        where.put("Username", username);
+        Map<String, String> where = ImmutableMap.of("Username", username);
         List<Map<String, String>> result = querier.queryWhere(table, columns, where);
 
         if (!result.isEmpty()) {
@@ -91,7 +90,6 @@ public class LoginService {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -101,8 +99,7 @@ public class LoginService {
             throw new BadCredentialsException("Incorrectly formatted username or password.");
         }
 
-        Map<String, String> where = new HashMap<>();
-        where.put("Username", username);
+        Map<String, String> where = ImmutableMap.of("Username", username);
         List<Map<String, String>> result = querier.queryWhere(table, columns, where);
 
         if (!result.isEmpty()) {
