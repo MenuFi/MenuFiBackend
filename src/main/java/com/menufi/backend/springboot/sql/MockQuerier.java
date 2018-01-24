@@ -1,6 +1,10 @@
 package com.menufi.backend.springboot.sql;
 
 import com.google.common.collect.ImmutableMap;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -9,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+@Service
+@Scope(value= ConfigurableBeanFactory.SCOPE_SINGLETON)
+@Profile("test")
 public class MockQuerier implements Querier {
     private Map<String, List<Map<String, String>>> db = new HashMap<>();
 
