@@ -30,8 +30,8 @@ public class HelloworldController {
             Querier querier = CloudSqlQuerier.getSqlQuerier();
             List<Map<String,String>> result1 = querier.query("patron_login", null);
             List<Map<String,String>> result2 = querier.query("patron_login", ImmutableList.of("Email"));
-            System.out.println(SqlUtil.queryResultsToString(result));
-            return SqlUtil.queryResultsToString(result);
+            System.out.println(SqlUtil.queryResultsToString(result1));
+            return SqlUtil.queryResultsToString(result1);
         }
     }
 }
