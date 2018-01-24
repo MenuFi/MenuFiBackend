@@ -1,10 +1,11 @@
-package com.menufi.backend.sql;
+package com.menufi.backend.springboot.sql;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class MockQuerier implements Querier {
     private Map<String, List<Map<String, String>>> db = new HashMap<>();
@@ -13,6 +14,10 @@ public class MockQuerier implements Querier {
     public List<Map<String, String>> query(String table, List<String> columns) {
         List<Map<String,String>> dbTable = db.get(table);
         List<Map<String,String>> result = new ArrayList<>();
+        if (dbTable == null) {
+            Logger.getLogger("MockQuerier").severe("Queried table does not exist: " + table);
+            return result;
+        }
         for (Map<String, String> entry : dbTable) {
             if (columns == null) {
                 result.add(entry);
@@ -33,6 +38,10 @@ public class MockQuerier implements Querier {
     public List<Map<String, String>> queryWhere(String table, List<String> columns, Map<String, String> where) {
         List<Map<String,String>> dbTable = db.get(table);
         List<Map<String,String>> result = new ArrayList<>();
+        if (dbTable == null) {
+            Logger.getLogger("MockQuerier").severe("Queried table does not exist: " + table);
+            return result;
+        }
         for (Map<String, String> row: dbTable) {
             boolean matches = true;
             for (String colName: where.keySet()) {
@@ -71,6 +80,11 @@ public class MockQuerier implements Querier {
 
     @Override
     public boolean rawInsert(String query) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean update(String table, Map<String, String> updates, Map<String, String> where) {
         throw new UnsupportedOperationException();
     }
 }

@@ -1,4 +1,4 @@
-package com.menufi.backend.sql;
+package com.menufi.backend.springboot.sql;
 
 import com.google.common.base.Joiner;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -16,9 +16,10 @@ import java.util.logging.Logger;
 @Service
 @Scope(value= ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class CloudSqlQuerier implements Querier {
-    private static final String INSERT_FORMAT = "INSERT INTO %s (%s) VALUES (%s)";
+    private static final String INSERT_FORMAT = "INSERT INTO %s (%s) VALUES (%s);";
     private static final String SELECT_FORMAT = "SELECT %s FROM %s";
-    private static final String SELECT_WHERE_FORMAT = "SELECT %s FROM %s WHERE %s";
+    private static final String SELECT_WHERE_FORMAT = "SELECT %s FROM %s WHERE %s;";
+    private static final String UPDATE_FORMAT = "UPDATE %s SET %s WHERE %s;";
 
     private static Logger logger = Logger.getLogger("SqlLogger");
     private static boolean initialized = false;
@@ -56,20 +57,27 @@ public class CloudSqlQuerier implements Querier {
 
     private List<Map<String, String>> executeSelect(String query) {
         List<Map<String, String>> result = new ArrayList<>();
+        ResultSet rs;
         try {
             logger.info("Executing query: " + query);
-            ResultSet rs = conn.prepareStatement(query).executeQuery();
-            ResultSetMetaData md = rs.getMetaData();
-            while (rs.next()) {
-                HashMap<String, String> entry = new HashMap<>();
-                for (int i = 0; i < md.getColumnCount(); i++) {
-                    entry.put(md.getColumnName(i), rs.getString(i));
-                }
-            }
+            rs = conn.prepareStatement(query).executeQuery();
         } catch (SQLException e) {
             logger.severe("Unable to execute query: " + query);
             logger.severe(e.getMessage());
             return null;
+        }
+        try {
+            ResultSetMetaData md = rs.getMetaData();
+            while (rs.next()) {
+                HashMap<String, String> entry = new HashMap<>();
+                for (int i = 1; i <= md.getColumnCount(); i++) {
+                    entry.put(md.getColumnLabel(i), rs.getString(i));
+                }
+                result.add(entry);
+            }
+        } catch (SQLException e) {
+            logger.severe("Error while parsing query result");
+            logger.severe(e.toString());
         }
         return result;
     }
@@ -112,6 +120,31 @@ public class CloudSqlQuerier implements Querier {
             conn.prepareStatement(query).executeUpdate();
         } catch (SQLException e) {
             logger.severe("Error while executing sql insert statement");
+            logger.severe(e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean update(String table, Map<String, String> updates, Map<String, String> where) {
+        List<String> whereConditionList = new ArrayList<>();
+        for (String colName: where.keySet()) {
+            whereConditionList.add(String.format("%s='%s'", colName, where.get(colName)));
+        }
+        String whereString = Joiner.on(" and ").join(whereConditionList);
+
+        List<String> updatesList = new ArrayList<>();
+        for (String colName: updates.keySet()) {
+            updatesList.add(String.format("%s='%s'", colName, updates.get(colName)));
+        }
+        String updatesString = Joiner.on(" and ").join(updatesList);
+
+        String query = String.format(UPDATE_FORMAT, table, updatesString, whereString);
+        try {
+            conn.prepareStatement(query).executeUpdate();
+        } catch (SQLException e) {
+            logger.severe("Error while executing sql update statement: " + query);
             logger.severe(e.getMessage());
             return false;
         }

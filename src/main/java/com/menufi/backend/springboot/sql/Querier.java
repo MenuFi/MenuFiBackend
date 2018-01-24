@@ -1,4 +1,4 @@
-package com.menufi.backend.sql;
+package com.menufi.backend.springboot.sql;
 
 import java.sql.ResultSet;
 import java.util.List;
@@ -13,5 +13,6 @@ public interface Querier {
     boolean insert(String table, Map<String, String> values);
     @Deprecated
     boolean rawInsert(String query);
+    boolean update(String table, Map<String, String> updates, Map<String, String> where);
 
 }
