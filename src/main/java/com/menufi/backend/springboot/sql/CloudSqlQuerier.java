@@ -2,6 +2,7 @@ package com.menufi.backend.springboot.sql;
 
 import com.google.common.base.Joiner;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.logging.Logger;
 
 @Service
 @Scope(value= ConfigurableBeanFactory.SCOPE_SINGLETON)
+@Profile("default")
 public class CloudSqlQuerier implements Querier {
     private static final String INSERT_FORMAT = "INSERT INTO %s (%s) VALUES (%s);";
     private static final String SELECT_FORMAT = "SELECT %s FROM %s";
