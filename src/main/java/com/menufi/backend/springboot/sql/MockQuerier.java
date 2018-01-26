@@ -7,10 +7,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Service
@@ -18,6 +15,11 @@ import java.util.logging.Logger;
 @Profile("test")
 public class MockQuerier implements Querier {
     private Map<String, List<Map<String, String>>> db = new HashMap<>();
+
+    public MockQuerier() {
+        db.put("patron_login", new ArrayList<>());
+        db.put("restaurant_login", new ArrayList<>());
+    }
 
     @Override
     public List<Map<String, String>> query(String table, List<String> columns) {
