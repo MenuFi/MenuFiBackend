@@ -34,7 +34,9 @@ public class LoginService {
 
     public CredentialToken loginPatron(String username, String password) {
         if (loginUser(username, password, PATRON_TABLE, PATRON_LOGIN_COLUMNS)) {
-            return generateToken(username);
+            CredentialToken token = generateToken(username);
+            tokenBank.put(username, token);
+            return token;
         }
         throw new InvalidCredentialsException("Wrong username or password.");
     }
@@ -45,7 +47,9 @@ public class LoginService {
 
     public CredentialToken loginRestaurant(String username, String password) {
         if (loginUser(username, password, RESTAURANT_TABLE, RESTAURANT_LOGIN_COLUMNS)) {
-            return generateToken(username);
+            CredentialToken token = generateToken(username);
+            tokenBank.put(username, token);
+            return token;
         }
         throw new InvalidCredentialsException("Wrong username or password.");
     }
@@ -87,6 +91,7 @@ public class LoginService {
         if (!result.isEmpty()) {
             String resultPasswordHash = result.get(0).getOrDefault("PasswordHash", null);
             if (resultPasswordHash.equals(Long.toString(hashPassword(password)))) {
+
                 return true;
             }
         }
