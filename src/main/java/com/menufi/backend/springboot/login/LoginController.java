@@ -17,7 +17,7 @@ public class LoginController {
     public String loginPatron(@RequestBody Map<String, Object> rawBody) {
         Map<String, String> bodyStringMap = translateRequestBodyToStringMap(rawBody);
 
-        String username = bodyStringMap.getOrDefault("username", null);
+        String username = bodyStringMap.getOrDefault("email", null);
         String password = bodyStringMap.getOrDefault("password", null);
 
         return this.loginService.loginPatron(username, password).getTokenString();
@@ -28,7 +28,7 @@ public class LoginController {
     public boolean registerPatron(@RequestBody Map<String, Object> rawBody) {
         Map<String, String> bodyStringMap = translateRequestBodyToStringMap(rawBody);
 
-        String username = bodyStringMap.getOrDefault("username", null);
+        String username = bodyStringMap.getOrDefault("email", null);
         String password = bodyStringMap.getOrDefault("password", null);
 
         return this.loginService.registerPatron(username, password);
@@ -39,7 +39,7 @@ public class LoginController {
     public String loginRestaurant(@RequestBody Map<String, Object> rawBody) {
         Map<String, String> bodyStringMap = translateRequestBodyToStringMap(rawBody);
 
-        String username = bodyStringMap.getOrDefault("username", null);
+        String username = bodyStringMap.getOrDefault("email", null);
         String password = bodyStringMap.getOrDefault("password", null);
 
         return this.loginService.loginRestaurant(username, password).getTokenString();
@@ -50,7 +50,7 @@ public class LoginController {
     public boolean registerRestaurant(@RequestBody Map<String, Object> rawBody) {
         Map<String, String> bodyStringMap = translateRequestBodyToStringMap(rawBody);
 
-        String username = bodyStringMap.getOrDefault("username", null);
+        String username = bodyStringMap.getOrDefault("email", null);
         String password = bodyStringMap.getOrDefault("password", null);
 
         return this.loginService.registerRestaurant(username, password);

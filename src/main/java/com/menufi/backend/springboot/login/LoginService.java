@@ -17,7 +17,7 @@ public class LoginService {
     private static final String PATRON_TABLE = "patron_login";
     private static final List<String> PATRON_LOGIN_COLUMNS = ImmutableList.of("PasswordHash");
 
-    private static final List<String> PATRON_REGISTER_COLUMNS = ImmutableList.of("Username");
+    private static final List<String> PATRON_REGISTER_COLUMNS = ImmutableList.of("Email");
 
     private static final String RESTAURANT_TABLE = "restaurant_login";
     private static final List<String> RESTAURANT_LOGIN_COLUMNS = PATRON_LOGIN_COLUMNS;
@@ -32,30 +32,30 @@ public class LoginService {
         this.tokenBank = new HashMap<>();
     }
 
-    public CredentialToken loginPatron(String username, String password) {
-        if (loginUser(username, password, PATRON_TABLE, PATRON_LOGIN_COLUMNS)) {
-            CredentialToken token = generateToken(username);
-            tokenBank.put(username, token);
+    public CredentialToken loginPatron(String email, String password) {
+        if (loginUser(email, password, PATRON_TABLE, PATRON_LOGIN_COLUMNS)) {
+            CredentialToken token = generateToken(email);
+            tokenBank.put(email, token);
             return token;
         }
-        throw new InvalidCredentialsException("Wrong username or password.");
+        throw new InvalidCredentialsException("Wrong email or password.");
     }
 
-    public boolean registerPatron(String username, String password) {
-        return registerUser(username, password, PATRON_TABLE, PATRON_REGISTER_COLUMNS);
+    public boolean registerPatron(String email, String password) {
+        return registerUser(email, password, PATRON_TABLE, PATRON_REGISTER_COLUMNS);
     }
 
-    public CredentialToken loginRestaurant(String username, String password) {
-        if (loginUser(username, password, RESTAURANT_TABLE, RESTAURANT_LOGIN_COLUMNS)) {
-            CredentialToken token = generateToken(username);
-            tokenBank.put(username, token);
+    public CredentialToken loginRestaurant(String email, String password) {
+        if (loginUser(email, password, RESTAURANT_TABLE, RESTAURANT_LOGIN_COLUMNS)) {
+            CredentialToken token = generateToken(email);
+            tokenBank.put(email, token);
             return token;
         }
-        throw new InvalidCredentialsException("Wrong username or password.");
+        throw new InvalidCredentialsException("Wrong email or password.");
     }
 
-    public boolean registerRestaurant(String username, String password) {
-        return registerUser(username, password, RESTAURANT_TABLE, RESTAURANT_REGISTER_COLUMNS);
+    public boolean registerRestaurant(String email, String password) {
+        return registerUser(email, password, RESTAURANT_TABLE, RESTAURANT_REGISTER_COLUMNS);
     }
 
     public String authenticateToken(String tokenString) {
@@ -72,20 +72,20 @@ public class LoginService {
 
     private CredentialToken generateToken(String user) {
         // TODO: Actually generate tokens...
-        return new CredentialToken(user, "some expiring token?");
+        return new CredentialToken(user, "Some Expiring Token!");
     }
 
-    private boolean verifyCredentials(String username, String password) {
-        return username != null && password != null && !username.isEmpty() && !password.isEmpty();
+    private boolean verifyCredentials(String email, String password) {
+        return email != null && password != null && !email.isEmpty() && !password.isEmpty();
     }
 
-    private boolean loginUser(String username, String password, String table, List<String> columns) {
+    private boolean loginUser(String email, String password, String table, List<String> columns) {
 
-        if (!verifyCredentials(username, password)) {
-            throw new BadCredentialsException("Incorrectly formatted username or password.");
+        if (!verifyCredentials(email, password)) {
+            throw new BadCredentialsException("Incorrectly formatted email or password.");
         }
 
-        Map<String, String> where = ImmutableMap.of("Username", username);
+        Map<String, String> where = ImmutableMap.of("Email", email);
         List<Map<String, String>> result = querier.queryWhere(table, columns, where);
 
         if (!result.isEmpty()) {
@@ -95,13 +95,13 @@ public class LoginService {
         return false;
     }
 
-    private boolean registerUser(String username, String password, String table, List<String> columns) {
+    private boolean registerUser(String email, String password, String table, List<String> columns) {
 
-        if (!verifyCredentials(username, password)) {
-            throw new BadCredentialsException("Incorrectly formatted username or password.");
+        if (!verifyCredentials(email, password)) {
+            throw new BadCredentialsException("Incorrectly formatted email or password.");
         }
 
-        Map<String, String> where = ImmutableMap.of("Username", username);
+        Map<String, String> where = ImmutableMap.of("Email", email);
         List<Map<String, String>> result = querier.queryWhere(table, columns, where);
 
         if (!result.isEmpty()) {
@@ -109,7 +109,7 @@ public class LoginService {
         }
 
         Map<String, String> insertValues = new HashMap<>();
-        insertValues.put("Username", username);
+        insertValues.put("Email", email);
         insertValues.put("PasswordHash", Long.toString(hashPassword(password)));
 
         return querier.insert(table, insertValues);
