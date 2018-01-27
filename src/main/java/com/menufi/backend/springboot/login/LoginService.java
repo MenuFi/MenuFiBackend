@@ -86,9 +86,7 @@ public class LoginService {
 
         if (!result.isEmpty()) {
             String resultPasswordHash = result.get(0).getOrDefault("PasswordHash", null);
-            if (resultPasswordHash.equals(Long.toString(hashPassword(password)))) {
-                return true;
-            }
+            return resultPasswordHash.equals(Long.toString(hashPassword(password)));
         }
         return false;
     }

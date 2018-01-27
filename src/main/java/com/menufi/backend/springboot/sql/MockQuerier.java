@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-@Service
+@Service("MockQuerier")
 @Scope(value= ConfigurableBeanFactory.SCOPE_SINGLETON)
 @Profile("test")
 public class MockQuerier implements Querier {

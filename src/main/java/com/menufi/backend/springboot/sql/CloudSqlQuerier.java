@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Service
+@Service("CloudSqlQuerier")
 @Scope(value= ConfigurableBeanFactory.SCOPE_SINGLETON)
 @Profile("default")
 public class CloudSqlQuerier implements Querier {
@@ -24,18 +24,10 @@ public class CloudSqlQuerier implements Querier {
     private static final String UPDATE_FORMAT = "UPDATE %s SET %s WHERE %s;";
 
     private static Logger logger = Logger.getLogger("SqlLogger");
-    private static boolean initialized = false;
-    private static CloudSqlQuerier querier;
     private Connection conn;
 
-    private CloudSqlQuerier() {}
-
-    public static CloudSqlQuerier getSqlQuerier() {
-        if (!initialized) {
-            querier = new CloudSqlQuerier();
-            initialized = querier.initialize();
-        }
-        return querier;
+    public CloudSqlQuerier() {
+        initialize();
     }
 
     @Override
@@ -101,12 +93,13 @@ public class CloudSqlQuerier implements Querier {
         List<String> colValuesList = new ArrayList<>();
         for (String colName: values.keySet()) {
             colNamesList.add(colName);
-            colValuesList.add(values.get(colName));
+            colValuesList.add(String.format("'%s'", values.get(colName)));
         }
         String colNames = Joiner.on(",").join(colNamesList);
         String colValues = Joiner.on(",").join(colValuesList);
         String query = String.format(INSERT_FORMAT, table, colNames, colValues);
         try {
+            logger.info("Executing insert: " + query);
             conn.prepareStatement(query).executeUpdate();
         } catch (SQLException e) {
             logger.severe("Error while executing insert statement: " + query);
@@ -144,6 +137,7 @@ public class CloudSqlQuerier implements Querier {
 
         String query = String.format(UPDATE_FORMAT, table, updatesString, whereString);
         try {
+            logger.info("Executing update: " + query);
             conn.prepareStatement(query).executeUpdate();
         } catch (SQLException e) {
             logger.severe("Error while executing sql update statement: " + query);
