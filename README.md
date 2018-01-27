@@ -2,6 +2,11 @@
 ## Entry Point
 com.menufi.backend.springboot.MenuFiSpringBootApplication
 
+## Configuration
+Edit `spring.profiles.active` property in _src/main/resources/application.properties_ to either:
+* `default` (uses `CloudSqlQuerier`)
+* `test` (uses `MockQuerier`)
+
 ## Gradle Wrapper
 Change gradle properties in `gradle/wrapper`
 
