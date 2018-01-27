@@ -32,7 +32,7 @@ public class LoginService {
         this.tokenBank = new HashMap<>();
     }
 
-    public CredentialToken loginPatron(String email, String password) {
+    public CredentialToken loginPatron(String email, String password) throws BadCredentialsException, InvalidCredentialsException {
         if (loginUser(email, password, PATRON_TABLE, PATRON_LOGIN_COLUMNS)) {
             CredentialToken token = generateToken(email);
             tokenBank.put(email, token);
@@ -41,11 +41,11 @@ public class LoginService {
         throw new InvalidCredentialsException("Wrong email or password.");
     }
 
-    public boolean registerPatron(String email, String password) {
+    public boolean registerPatron(String email, String password) throws BadCredentialsException, InvalidCredentialsException {
         return registerUser(email, password, PATRON_TABLE, PATRON_REGISTER_COLUMNS);
     }
 
-    public CredentialToken loginRestaurant(String email, String password) {
+    public CredentialToken loginRestaurant(String email, String password) throws BadCredentialsException, InvalidCredentialsException {
         if (loginUser(email, password, RESTAURANT_TABLE, RESTAURANT_LOGIN_COLUMNS)) {
             CredentialToken token = generateToken(email);
             tokenBank.put(email, token);
@@ -54,7 +54,7 @@ public class LoginService {
         throw new InvalidCredentialsException("Wrong email or password.");
     }
 
-    public boolean registerRestaurant(String email, String password) {
+    public boolean registerRestaurant(String email, String password) throws BadCredentialsException, InvalidCredentialsException {
         return registerUser(email, password, RESTAURANT_TABLE, RESTAURANT_REGISTER_COLUMNS);
     }
 
