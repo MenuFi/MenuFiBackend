@@ -15,8 +15,8 @@ public class RestaurantController {
     private RestaurantService restaurantService;
 
     @CrossOrigin
-    @RequestMapping("/restaurants/nearby")
-    public Collection<Restaurant> nearbyRestaurants(@RequestParam(value="address", required=true) String address) {
-        return restaurantService.getNearbyRestaurants(address);
+    @RequestMapping("/restaurants")
+    public Collection<Restaurant> allRestaurants() {
+        return restaurantService.getRestaurants();
     }
 }
