@@ -1,22 +1,72 @@
 package com.menufi.backend.springboot.menu;
 
 public class MenuItem {
-    public final int id; // make it hashable later
-    public String name;
-    public String imageUrl; //InetAddress in android
-    public String description;
-    public float price;
-    public float rating;
+    private final int menuItemId;
+    private final int restaurantId;
+    private String name;
+    private double price;
+    private int calories;
+    private String description;
+    private double rating;
+    private String pictureUri;
+    private String[] ingredients;
+    private int[] dietaryPreferences;
 
-    public MenuItem(int id, String name, String imageUrl, String description, float price, float rating) {
-        this.id = id;
+    public MenuItem(int menuItemId, int restaurantId, String name, double price, int calories, String description, double rating, String pictureUri) {
+        this.menuItemId = menuItemId;
+        this.restaurantId = restaurantId;
         this.name = name;
-        this.imageUrl = imageUrl;
-        this.description = description;
         this.price = price;
+        this.calories = calories;
+        this.description = description;
         this.rating = rating;
+        this.pictureUri = pictureUri;
+        this.ingredients = new String[0];
+        this.dietaryPreferences = new int[0];
     }
     // TODO: Constructor chaining
-    // TODO: GET and SET METHODS
 
+    public int getMenuItemId() {
+        return menuItemId;
+    }
+
+    public int getRestaurantId() {
+        return restaurantId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public int getCalories() {
+        return calories;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public String getPictureUri() {
+        return pictureUri;
+    }
+
+    public String[] getIngredients() { return ingredients; }
+
+    public int[] getDietaryPreferences() { return dietaryPreferences; }
+
+    public void setIngredients(String[] ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public void setDietaryPreferences(int[] dietaryPreferences) {
+        this.dietaryPreferences = dietaryPreferences;
+    }
 }
