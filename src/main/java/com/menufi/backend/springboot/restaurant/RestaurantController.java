@@ -1,10 +1,12 @@
 package com.menufi.backend.springboot.restaurant;
 
+import com.menufi.backend.springboot.CustomResponse;
+import com.menufi.backend.springboot.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
@@ -15,8 +17,8 @@ public class RestaurantController {
     private RestaurantService restaurantService;
 
     @CrossOrigin
-    @RequestMapping("/restaurants")
-    public Collection<Restaurant> allRestaurants() {
-        return restaurantService.getRestaurants();
+    @RequestMapping(method= RequestMethod.GET, value="/restaurants", produces= MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CustomResponse<Collection<Restaurant>>> allRestaurants() {
+        return new ResponseEntity<>(new SuccessResponse<>(restaurantService.getRestaurants()), HttpStatus.OK);
     }
 }

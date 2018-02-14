@@ -3,10 +3,10 @@ package com.menufi.backend.springboot.restaurant;
 public class Restaurant {
     private final int restaurantId; // make it hashable later;
     private String name;
-    private float price;
+    private double price;
     private String pictureUri;
 
-    public Restaurant(int restaurantId, String name, float price, String pictureUri) {
+    public Restaurant(int restaurantId, String name, double price, String pictureUri) {
         this.restaurantId = restaurantId;
         this.name = name;
         this.price = price;
@@ -22,7 +22,7 @@ public class Restaurant {
         return name;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 

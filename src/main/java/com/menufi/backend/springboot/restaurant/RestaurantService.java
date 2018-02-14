@@ -39,7 +39,7 @@ public class RestaurantService {
         return !canTranslate ? null : new Restaurant(
                 Integer.parseInt(entry.get("RestaurantId")),
                 entry.get("Name"),
-                Float.parseFloat(entry.get("Price")),
+                Double.parseDouble(entry.get("Price")),
                 entry.get("PictureUri")
         );
     }
