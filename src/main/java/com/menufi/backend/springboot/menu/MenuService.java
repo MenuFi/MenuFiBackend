@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 public class MenuService {
@@ -40,15 +41,16 @@ public class MenuService {
 
     public boolean addDietaryPreferences(int[] dietaryPreferenes, int menuItemId) {
         boolean succeeded = true;
-        Collection<DietaryPreference> allDietaryPreferences = getAllDietaryPreferences();
+        Stream<DietaryPreference> allDietaryPreferences = getAllDietaryPreferences().stream();
         List<Integer> validPreferences = new ArrayList<>();
         for (int preferenceId : dietaryPreferenes) {
-            if (allDietaryPreferences.contains(preferenceId)) {
+            if (allDietaryPreferences.anyMatch((dietaryPreference) -> dietaryPreference.getDietaryPreferenceId() == preferenceId )) {
                 validPreferences.add(preferenceId);
             } else {
                 succeeded = false;
             }
         }
+        allDietaryPreferences.close();
         List<Map<String, String>> preferenceValues = MenuService.translateFromPreferenceIds(validPreferences, menuItemId);
         for (Map<String, String> preferenceRow : preferenceValues) {
             succeeded = succeeded && querier.insert(PREFERENCES_MAPPING_TABLE, preferenceRow);
