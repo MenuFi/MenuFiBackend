@@ -30,6 +30,14 @@ public class MenuService {
     @Autowired
     private Querier querier;
 
+    public boolean updateMenuItem(int restaurantId, int menuItemId, MenuItem menuItem) {
+        Map<String, String> updateValues = MenuService.translateFromMenuItemForUpdate(menuItem);
+        Map<String, String> whereClause = new HashMap<>();
+        whereClause.put("RestaurantId", Integer.toString(restaurantId));
+        whereClause.put("MenuItemId", Integer.toString(menuItemId));
+        return querier.update(MENU_TABLE, updateValues, whereClause);
+    }
+
     public boolean addIngredients(String[] ingredients, int menuItemId) {
         boolean succeeded = true;
         List<Map<String, String>> ingredientsValues = MenuService.translateFromIngredients(ingredients, menuItemId);
@@ -187,6 +195,17 @@ public class MenuService {
         addMenuItemValues.put("Rating", Double.toString(addMenuItemRequest.getRating()));
         addMenuItemValues.put("PictureUri", addMenuItemRequest.getPictureUri());
         return addMenuItemValues;
+    }
+
+    public static Map<String, String> translateFromMenuItemForUpdate(MenuItem menuItem) {
+        Map<String, String> updateMenuItemValues = new HashMap<>();
+        updateMenuItemValues.put("Name", menuItem.getName());
+        updateMenuItemValues.put("Price", Double.toString(menuItem.getPrice()));
+        updateMenuItemValues.put("Calories", Integer.toString(menuItem.getCalories()));
+        updateMenuItemValues.put("Description", menuItem.getDescription());
+        updateMenuItemValues.put("Rating", Double.toString(menuItem.getRating()));
+        updateMenuItemValues.put("PictureUri", menuItem.getPictureUri());
+        return updateMenuItemValues;
     }
 
     public static MenuItem translateToMenuItem(Map<String, String> entry) {

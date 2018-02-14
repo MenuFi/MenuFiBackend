@@ -56,5 +56,7 @@ public class AddMenuItemRequest {
     public String[] getIngredients() { return ingredients; }
 
     public int[] getDietaryPreferences() { return dietaryPreferences; }
+
+    public void setRestaurantId(int restaurantId) { this.restaurantId = restaurantId; }
 }
 

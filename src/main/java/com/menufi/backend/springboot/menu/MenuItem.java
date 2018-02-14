@@ -1,8 +1,8 @@
 package com.menufi.backend.springboot.menu;
 
 public class MenuItem {
-    private final int menuItemId;
-    private final int restaurantId;
+    private int menuItemId;
+    private int restaurantId;
     private String name;
     private double price;
     private int calories;
@@ -11,6 +11,8 @@ public class MenuItem {
     private String pictureUri;
     private String[] ingredients;
     private int[] dietaryPreferences;
+
+    public MenuItem() {}
 
     public MenuItem(int menuItemId, int restaurantId, String name, double price, int calories, String description, double rating, String pictureUri) {
         this.menuItemId = menuItemId;
