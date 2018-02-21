@@ -133,7 +133,7 @@ public class CloudSqlQuerier implements Querier {
         for (String colName: updates.keySet()) {
             updatesList.add(String.format("%s='%s'", colName, updates.get(colName)));
         }
-        String updatesString = Joiner.on(" and ").join(updatesList);
+        String updatesString = Joiner.on(", ").join(updatesList);
 
         String query = String.format(UPDATE_FORMAT, table, updatesString, whereString);
         try {
