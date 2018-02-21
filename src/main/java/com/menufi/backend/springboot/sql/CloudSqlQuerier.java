@@ -22,6 +22,7 @@ public class CloudSqlQuerier implements Querier {
     private static final String SELECT_FORMAT = "SELECT %s FROM %s";
     private static final String SELECT_WHERE_FORMAT = "SELECT %s FROM %s WHERE %s;";
     private static final String UPDATE_FORMAT = "UPDATE %s SET %s WHERE %s;";
+    private static final String DELETE_FORMAT = "DELETE FROM %s WHERE %s";
 
     private static Logger logger = Logger.getLogger("SqlLogger");
     private Connection conn;
@@ -138,13 +139,33 @@ public class CloudSqlQuerier implements Querier {
         String query = String.format(UPDATE_FORMAT, table, updatesString, whereString);
         try {
             logger.info("Executing update: " + query);
-            conn.prepareStatement(query).executeUpdate();
+            return 0 != conn.prepareStatement(query).executeUpdate();
         } catch (SQLException e) {
             logger.severe("Error while executing sql update statement: " + query);
             logger.severe(e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public boolean delete(String table, Map<String, String> where) {
+        List<String> whereConditionList = new ArrayList<>();
+        for (String colName: where.keySet()) {
+            whereConditionList.add(String.format("%s='%s'", colName, where.get(colName)));
+        }
+        String whereString = Joiner.on(" and ").join(whereConditionList);
+
+        String query = String.format(DELETE_FORMAT, table, whereString);
+        try {
+            logger.info("Executing delete: " + query);
+            conn.prepareStatement(query).executeUpdate();
+        } catch (SQLException e) {
+            logger.severe("Error while executing sql delete statement: " + query);
+            logger.severe(e.getMessage());
+            return false;
+        }
         return true;
+
     }
 
     private boolean initialize() {

@@ -105,6 +105,19 @@ public class MockQuerier implements Querier {
         return true;
     }
 
+    @Override
+    public boolean delete(String tableName, Map<String, String> where) {
+        List<Map<String, String>> table = db.get(tableName);
+        List<Map<String, String>> newTable = new ArrayList<>();
+        for (Map<String, String> entry: table) {
+            if (!entryMatchesWhere(entry, where)) {
+                newTable.add(entry);
+            }
+        }
+        db.put(tableName, newTable);
+        return true;
+    }
+
     private void mergeMaps(Map<String, String> first, Map<String, String> second) {
         for (String col : second.keySet()) {
             first.put(col, second.get(col));

@@ -14,5 +14,6 @@ public interface Querier {
     @Deprecated
     boolean rawInsert(String query);
     boolean update(String table, Map<String, String> updates, Map<String, String> where);
+    boolean delete(String table, Map<String, String> where);
 
 }
