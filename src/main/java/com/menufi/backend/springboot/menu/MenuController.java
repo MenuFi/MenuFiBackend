@@ -34,7 +34,11 @@ public class MenuController {
     @CrossOrigin
     @RequestMapping(method= RequestMethod.GET, value="/restaurants/{restaurantId}/items/{menuItemId}", produces= MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CustomResponse<MenuItem>> getMenuItem(@PathVariable int restaurantId, @PathVariable int menuItemId) {
-        return new ResponseEntity<>(new SuccessResponse<>(menuService.getMenuItem(restaurantId, menuItemId)), HttpStatus.OK);
+        MenuItem menuItem = menuService.getMenuItem(restaurantId, menuItemId);
+        if (menuItem != null) {
+            return new ResponseEntity<>(new SuccessResponse<>(menuItem), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new ErrorResponse<>(menuItem), HttpStatus.NOT_FOUND);
     }
 
     @CrossOrigin
