@@ -35,7 +35,30 @@ public class MenuService {
         Map<String, String> whereClause = new HashMap<>();
         whereClause.put("RestaurantId", Integer.toString(restaurantId));
         whereClause.put("MenuItemId", Integer.toString(menuItemId));
-        return querier.update(MENU_TABLE, updateValues, whereClause);
+        if (querier.update(MENU_TABLE, updateValues, whereClause)) {
+            if (updateIngredients(menuItem.getIngredients(), menuItemId)) {
+                return updateDietaryPreferences(menuItem.getDietaryPreferences(), menuItemId);
+            }
+        }
+        return false;
+    }
+
+    public boolean updateIngredients(String[] ingredients, int menuItemId) {
+        Map<String, String> deleteWhere = new HashMap<>();
+        deleteWhere.put("MenuItemId", Integer.toString(menuItemId));
+        if (querier.delete(INGREDIENTS_TABLE, deleteWhere)) {
+            return addIngredients(ingredients, menuItemId);
+        }
+        return false;
+    }
+
+    public boolean updateDietaryPreferences(int[] dietaryPreferences, int menuItemId) {
+        Map<String, String> deleteWhere = new HashMap<>();
+        deleteWhere.put("MenuItemId", Integer.toString(menuItemId));
+        if (querier.delete(PREFERENCES_MAPPING_TABLE, deleteWhere)) {
+            return addDietaryPreferences(dietaryPreferences, menuItemId);
+        }
+        return false;
     }
 
     public boolean addIngredients(String[] ingredients, int menuItemId) {
@@ -47,18 +70,20 @@ public class MenuService {
         return succeeded;
     }
 
-    public boolean addDietaryPreferences(int[] dietaryPreferenes, int menuItemId) {
+    public boolean addDietaryPreferences(int[] dietaryPreferences, int menuItemId) {
         boolean succeeded = true;
-        Stream<DietaryPreference> allDietaryPreferences = getAllDietaryPreferences().stream();
+        List<DietaryPreference> allDietaryPreferences = getAllDietaryPreferences();
         List<Integer> validPreferences = new ArrayList<>();
-        for (int preferenceId : dietaryPreferenes) {
-            if (allDietaryPreferences.anyMatch((dietaryPreference) -> dietaryPreference.getDietaryPreferenceId() == preferenceId )) {
-                validPreferences.add(preferenceId);
-            } else {
-                succeeded = false;
+        for (int preferenceId : dietaryPreferences) {
+            try (Stream<DietaryPreference> allDietaryPreferencesStream = allDietaryPreferences.stream()) {
+                if (allDietaryPreferencesStream.anyMatch((dietaryPreference) -> dietaryPreference.getDietaryPreferenceId() == preferenceId)) {
+                    validPreferences.add(preferenceId);
+                } else {
+                    succeeded = false;
+                }
+                allDietaryPreferencesStream.close();
             }
         }
-        allDietaryPreferences.close();
         List<Map<String, String>> preferenceValues = MenuService.translateFromPreferenceIds(validPreferences, menuItemId);
         for (Map<String, String> preferenceRow : preferenceValues) {
             succeeded = succeeded && querier.insert(PREFERENCES_MAPPING_TABLE, preferenceRow);
