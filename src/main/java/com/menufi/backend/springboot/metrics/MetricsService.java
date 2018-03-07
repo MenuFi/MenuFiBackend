@@ -17,7 +17,7 @@ public class MetricsService {
     @Autowired
     private Querier querier;
 
-    private static final String METRICS_TABLE = "restaurant_menu_items";
+    private static final String METRICS_TABLE = "METRICS_TABLE";
     private static final List<String> GET_METRICS_COLUMNS = ImmutableList.of("MenuItemClickId", "MenuItemId", "Timestamp", "UserId");
 
     public Collection<MenuItemClick> getMenuItemClicks(int menuItemId) {
@@ -28,15 +28,13 @@ public class MetricsService {
 //        whereClause.put("MenuItemClickId", Integer.toString());
         whereClause.put("MenuItemId", Integer.toString(menuItemId));
         List<Map<String, String>> result = querier.queryWhere(METRICS_TABLE, GET_METRICS_COLUMNS, whereClause);
-        if (!result.isEmpty()) {
+        for (Map<String, String> entry : result) {
             MenuItemClick mappedItemClick = MetricsService.translateToMenuItemClick(result.get(0));
             if (mappedItemClick != null) {
-                // TODO: need to add timestamp and UserId.
                 allMenuItemClicks.add(mappedItemClick);
-                return allMenuItemClicks;
             }
         }
-        return null;
+        return allMenuItemClicks;
     }
 
     public boolean addMenuItemClick(MenuItemClick menuItemClick) {
