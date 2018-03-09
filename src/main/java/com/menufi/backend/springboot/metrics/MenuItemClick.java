@@ -2,6 +2,8 @@ package com.menufi.backend.springboot.metrics;
 
 import java.sql.Timestamp;
 
+import static java.lang.Integer.MIN_VALUE;
+
 public class MenuItemClick {
     private int menuItemClickId;
     private int menuItemId;
@@ -14,6 +16,11 @@ public class MenuItemClick {
         this.timestamp = timestamp;
         this.userId = userId;
     }
+    public MenuItemClick(int menuItemId, Timestamp timestamp, int userId) {
+        this(MIN_VALUE, menuItemId,timestamp, userId);
+    }
+
+
 
     public int getMenuItemClickId() {
         return menuItemClickId;
