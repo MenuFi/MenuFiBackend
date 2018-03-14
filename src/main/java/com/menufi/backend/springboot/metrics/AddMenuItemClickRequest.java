@@ -6,7 +6,9 @@ public class AddMenuItemClickRequest {
     private int menuItemId;
     private int userId;
 
-    public AddMenuItemClickRequest(int menuItemClickId, int menuItemId, Timestamp timestamp, int userId) {
+    public AddMenuItemClickRequest() { }
+
+    public AddMenuItemClickRequest(int menuItemId, int userId) {
         this.menuItemId = menuItemId;
         this.userId = userId;
     }
@@ -18,5 +20,13 @@ public class AddMenuItemClickRequest {
 
     public int getUserId() {
         return userId;
+    }
+
+    public void setMenuItemId() {
+        this.menuItemId = menuItemId;
+    }
+
+    public void setUserId() {
+        this.userId = userId;
     }
 }

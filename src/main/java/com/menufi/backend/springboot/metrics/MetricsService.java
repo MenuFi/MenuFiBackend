@@ -27,7 +27,7 @@ public class MetricsService {
         whereClause.put("MenuItemId", Integer.toString(menuItemId));
         List<Map<String, String>> result = querier.queryWhere(MENU_METRICS_TABLE, GET_MENU_METRICS_COLUMNS, whereClause);
         for (Map<String, String> entry : result) {
-            MenuItemClick mappedItemClick = MetricsService.translateToMenuItemClick(result.get(0));
+            MenuItemClick mappedItemClick = MetricsService.translateToMenuItemClick(entry);
             if (mappedItemClick != null) {
                 allMenuItemClicks.add(mappedItemClick);
             }

@@ -59,7 +59,7 @@ public class MenuController {
             return new ResponseEntity<>(new CustomResponse<>("error", newMenuItemId, "Failed to create the menu item"), HttpStatus.BAD_REQUEST);
         }
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", "/items/" + newMenuItemId);
+        headers.add("Location", "/restaurants/" + restaurantId + "items/" + newMenuItemId);
         ResponseEntity<CustomResponse<Integer>> createdResponse = new ResponseEntity<>(
                 new CustomResponse<>("success", newMenuItemId, "Succeeded in creating menu item."),
                 headers,
