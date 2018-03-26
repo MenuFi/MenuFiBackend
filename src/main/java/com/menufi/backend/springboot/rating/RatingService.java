@@ -1,20 +1,43 @@
 package com.menufi.backend.springboot.rating;
 
+import com.google.common.collect.ImmutableList;
+import com.menufi.backend.springboot.login.LoginService;
 import com.menufi.backend.springboot.sql.Querier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class RatingService {
 
+    private static final String RATING_ITEM_TABLE = "menu_item_ratings";
+    private static final List<String> RATING_ITEM_COLUMNS = ImmutableList.of("Rating");
+
     @Autowired
     private Querier querier;
+
+    @Autowired
+    private LoginService loginService;
 
     public int putMenuItemRating(int menuItemId, String token, double rating) {
         return -1;
     }
 
     public MenuItemRating getMenuItemRating(int menuItemId, String token) {
+        int userId = loginService.authenticateToken(token);
+
+        Map<String, String> whereClause = new HashMap<>();
+        whereClause.put("MenuItemId", Integer.toString(menuItemId));
+        whereClause.put("UserId", Integer.toString(userId));
+
+        List<Map<String, String>> result = querier.queryWhere(RATING_ITEM_TABLE, RATING_ITEM_COLUMNS, whereClause);
+        if (!result.isEmpty()) {
+            double rating = Double.parseDouble(result.get(0).getOrDefault("Rating", "0"));
+            return new MenuItemRating(menuItemId, userId, rating);
+        }
         return null;
     }
 }

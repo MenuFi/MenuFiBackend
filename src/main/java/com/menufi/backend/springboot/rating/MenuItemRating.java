@@ -1,11 +1,17 @@
 package com.menufi.backend.springboot.rating;
 
 public class MenuItemRating {
-    public int menuItemId;
-    public int userId;
-    public double rating;
+    private int menuItemId;
+    private int userId;
+    private double rating;
 
     public MenuItemRating() { }
+
+    public MenuItemRating(int menuItemId, int userId, double rating) {
+        setMenuItemId(menuItemId);
+        setUserId(userId);
+        setRating(rating);
+    }
 
     public int getMenuItemId() {
         return menuItemId;

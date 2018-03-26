@@ -15,7 +15,7 @@ import java.util.Map;
 public class LoginService {
 
     private static final String PATRON_TABLE = "patron_login";
-    private static final List<String> PATRON_LOGIN_COLUMNS = ImmutableList.of("PasswordHash");
+    private static final List<String> PATRON_LOGIN_COLUMNS = ImmutableList.of("UserId", "PasswordHash");
 
     private static final List<String> PATRON_REGISTER_COLUMNS = ImmutableList.of("Email");
 
@@ -33,9 +33,10 @@ public class LoginService {
     }
 
     public CredentialToken loginPatron(String email, String password) throws BadCredentialsException, InvalidCredentialsException {
-        if (loginUser(email, password, PATRON_TABLE, PATRON_LOGIN_COLUMNS)) {
-            CredentialToken token = generateToken(email);
-            tokenBank.put(email, token);
+        int userId = loginUser(email, password, PATRON_TABLE, PATRON_LOGIN_COLUMNS);
+        if (userId != -1) {
+            CredentialToken token = generateToken(userId, email);
+            tokenBank.put(token.getTokenString(), token);
             return token;
         }
         throw new InvalidCredentialsException("Wrong email or password.");
@@ -46,9 +47,10 @@ public class LoginService {
     }
 
     public CredentialToken loginRestaurant(String email, String password) throws BadCredentialsException, InvalidCredentialsException {
-        if (loginUser(email, password, RESTAURANT_TABLE, RESTAURANT_LOGIN_COLUMNS)) {
-            CredentialToken token = generateToken(email);
-            tokenBank.put(email, token);
+        int userId = loginUser(email, password, RESTAURANT_TABLE, RESTAURANT_LOGIN_COLUMNS);
+        if (userId != -1) {
+            CredentialToken token = generateToken(userId, email);
+            tokenBank.put(token.getTokenString(), token);
             return token;
         }
         throw new InvalidCredentialsException("Wrong email or password.");
@@ -58,7 +60,7 @@ public class LoginService {
         return registerUser(email, password, RESTAURANT_TABLE, RESTAURANT_REGISTER_COLUMNS);
     }
 
-    public String authenticateToken(String tokenString) {
+    public int authenticateToken(String tokenString) {
         CredentialToken token = tokenBank.getOrDefault(tokenString, null);
         if (token == null) {
             throw new InvalidCredentialsException("Bad token.");
@@ -67,19 +69,19 @@ public class LoginService {
             tokenBank.remove(tokenString);
             throw new InvalidCredentialsException("Token has expired.");
         }
-        return token.getUser();
+        return token.getUserId();
     }
 
-    private CredentialToken generateToken(String user) {
+    private CredentialToken generateToken(int userId, String user) {
         // TODO: Actually generate tokens...
-        return new CredentialToken(user, "Some Expiring Token!");
+        return new CredentialToken(userId, user, "Some Expiring Token!");
     }
 
     private boolean verifyCredentials(String email, String password) {
         return email != null && password != null && !email.isEmpty() && !password.isEmpty();
     }
 
-    private boolean loginUser(String email, String password, String table, List<String> columns) {
+    private int loginUser(String email, String password, String table, List<String> columns) {
 
         if (!verifyCredentials(email, password)) {
             throw new BadCredentialsException("Incorrectly formatted email or password.");
@@ -90,9 +92,11 @@ public class LoginService {
 
         if (!result.isEmpty()) {
             String resultPasswordHash = result.get(0).getOrDefault("PasswordHash", null);
-            return resultPasswordHash.equals(Long.toString(hashPassword(password)));
+            if (resultPasswordHash.equals(Long.toString(hashPassword(password)))) {
+                return Integer.parseInt(result.get(0).getOrDefault("UserId", "-1"));
+            }
         }
-        return false;
+        return -1;
     }
 
     private boolean registerUser(String email, String password, String table, List<String> columns) {
