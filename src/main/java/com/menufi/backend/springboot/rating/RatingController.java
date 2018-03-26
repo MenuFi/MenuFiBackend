@@ -19,7 +19,7 @@ public class RatingController {
 
     @CrossOrigin
     @RequestMapping(method=RequestMethod.PUT, value="/items/{menuItemId}/rating/0", produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CustomResponse<Integer>> putMenuItemRating(@PathVariable int menuItemId, @RequestBody Map<String, String> body, @RequestHeader("Authorization") String auth) {
+    public ResponseEntity<CustomResponse<Boolean>> putMenuItemRating(@PathVariable int menuItemId, @RequestBody Map<String, String> body, @RequestHeader("Authorization") String auth) {
         // Expect the format to be: MenuFi mytokenstring
         String[] authStrings = auth.split("\\s+");
         if (authStrings.length > 1 && authStrings[0].equals("MenuFi")) {
@@ -28,24 +28,22 @@ public class RatingController {
             if (ratingRaw != null) {
                 try {
                     double rating = Double.parseDouble(ratingRaw);
-                    int newMenuItemId = ratingService.putMenuItemRating(menuItemId, authStrings[1], rating);
-                    if (newMenuItemId == -1) {
-                        return new ResponseEntity<>(new ErrorResponse<>(newMenuItemId, "Failed to create new rating"), HttpStatus.BAD_REQUEST);
+                    if (!ratingService.putMenuItemRating(menuItemId, authStrings[1], rating)) {
+                        return new ResponseEntity<>(new ErrorResponse<>(false, "Failed to create new rating"), HttpStatus.BAD_REQUEST);
                     }
-                    ResponseEntity<CustomResponse<Integer>> createdResponse = new ResponseEntity<>(
-                            new CustomResponse<>("success", newMenuItemId, "Succeeded in creating rating."),
+                    return new ResponseEntity<>(
+                            new CustomResponse<>("success", true, "Succeeded in putting rating."),
                             HttpStatus.CREATED
                     );
-                    return createdResponse;
                 } catch (NumberFormatException e) {
                     return new ResponseEntity(new ErrorResponse(e), HttpStatus.BAD_REQUEST);
                 } catch (InvalidCredentialsException e) {
                     return new ResponseEntity(new ErrorResponse(e), HttpStatus.UNAUTHORIZED);
                 }
             }
-            return new ResponseEntity<>(new ErrorResponse<Integer>(-1, "Missing rating."), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse<>(false, "Missing rating."), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ErrorResponse<>(null, "Improperly formatted token."), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(new ErrorResponse<>(false, "Improperly formatted token."), HttpStatus.UNAUTHORIZED);
     }
 
     @CrossOrigin

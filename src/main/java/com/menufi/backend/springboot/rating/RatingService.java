@@ -22,8 +22,22 @@ public class RatingService {
     @Autowired
     private LoginService loginService;
 
-    public int putMenuItemRating(int menuItemId, String token, double rating) {
-        return -1;
+    public boolean putMenuItemRating(int menuItemId, String token, double rating) {
+        int userId = loginService.authenticateToken(token);
+        Map<String, String> deleteWhere = new HashMap<>();
+        deleteWhere.put("MenuItemId", Integer.toString(menuItemId));
+        deleteWhere.put("UserId", Integer.toString(userId));
+        querier.delete(RATING_ITEM_TABLE, deleteWhere);
+        return addMenuItemRating(menuItemId, token, rating);
+    }
+
+    public boolean addMenuItemRating(int menuItemId, String token, double rating) {
+        int userId = loginService.authenticateToken(token);
+        Map<String, String> values = new HashMap<>();
+        values.put("MenuItemId", Integer.toString(menuItemId));
+        values.put("UserId", Integer.toString(userId));
+        values.put("Rating", Double.toString(rating));
+        return querier.insert(RATING_ITEM_TABLE, values);
     }
 
     public MenuItemRating getMenuItemRating(int menuItemId, String token) {

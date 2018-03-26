@@ -74,7 +74,7 @@ public class LoginService {
 
     private CredentialToken generateToken(int userId, String user) {
         // TODO: Actually generate tokens...
-        return new CredentialToken(userId, user, "Some Expiring Token!");
+        return new CredentialToken(userId, user, "SomeExpiringToken!");
     }
 
     private boolean verifyCredentials(String email, String password) {
