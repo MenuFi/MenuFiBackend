@@ -54,4 +54,18 @@ public class RatingService {
         }
         return null;
     }
+
+    public double getMenuItemRatingAverage(int menuItemId) {
+        Map<String, String> whereClause = new HashMap<>();
+        whereClause.put("MenuItemId", Integer.toString(menuItemId));
+        List<Map<String, String>> result = querier.queryWhere(RATING_ITEM_TABLE, RATING_ITEM_COLUMNS, whereClause);
+        if (result.isEmpty()) {
+            return 0.0;
+        }
+        double sum = 0.0;
+        for (Map<String, String> row : result) {
+            sum += Double.parseDouble(row.getOrDefault("Rating", "0"));
+        }
+        return sum / result.size();
+    }
 }

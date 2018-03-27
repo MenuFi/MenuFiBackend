@@ -65,5 +65,11 @@ public class RatingController {
         return new ResponseEntity<>(new ErrorResponse<>(null, "Improperly formatted token."), HttpStatus.UNAUTHORIZED);
     }
 
+    @CrossOrigin
+    @RequestMapping(method=RequestMethod.GET, value="/items/{menuItemId}/rating", produces=MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CustomResponse<Double>> getMenuItemRatingAverage(@PathVariable int menuItemId) {
+        double averageRating = ratingService.getMenuItemRatingAverage(menuItemId);
+        return new ResponseEntity<>(new SuccessResponse<>(averageRating), HttpStatus.OK);
+    }
 
 }

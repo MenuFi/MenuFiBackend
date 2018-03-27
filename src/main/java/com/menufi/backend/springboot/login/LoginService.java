@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class LoginService {
@@ -73,8 +74,7 @@ public class LoginService {
     }
 
     private CredentialToken generateToken(int userId, String user) {
-        // TODO: Actually generate tokens...
-        return new CredentialToken(userId, user, "SomeExpiringToken!");
+        return new CredentialToken(userId, user, UUID.randomUUID().toString());
     }
 
     private boolean verifyCredentials(String email, String password) {
