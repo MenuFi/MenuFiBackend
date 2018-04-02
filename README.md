@@ -18,6 +18,9 @@ More tasks: `./gradlew tasks`
 All responses are of the form:
 > { status: string, data: [] or {}, message: string }
 
+Authorization schema requires Authentication header in the form of:
+> Authentication: MenuFi YourLoginToken
+
 ### Login
 `POST` [/patron/loginToken](http://menufi-192821.appspot.com/patron/loginToken)
 
@@ -50,5 +53,5 @@ All responses are of the form:
 
 `PUT` [/items/{menuItemId}/rating/0](http://menufi-192821.appspot.com/items/5/rating/0)
 
-### restaurant
+### Restaurant
 `GET` [items/restaurants](http://menufi-192821.appspot.com/restaurants)
