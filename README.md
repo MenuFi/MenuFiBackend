@@ -15,9 +15,40 @@ To run locally: `./gradlew appengineRun`
 More tasks: `./gradlew tasks`
 
 ## Public API Routes
-`GET` [/items?restaurantId=](http://128.61.105.97:8080/items?restaurantId=0)
+All responses are of the form:
+> { status: string, data: [] or {}, message: string }
 
-`GET` [/restaurants/nearby?location=](http://128.61.105.97:8080/restaurants/nearby?location=somewhere)
+### Login
+`POST` [/patron/loginToken](http://menufi-192821.appspot.com/patron/loginToken)
 
-`POST` /items
-> { restaurantId: number, name: string, description: string, price: number }
+`POST` [/patron/registration](http://menufi-192821.appspot.com/patron/registration)
+
+`POST` [/restaurant/loginToken](http://menufi-192821.appspot.com/restaurant/loginToken)
+
+`POST` [/restaurant/registration](http://menufi-192821.appspot.com/patron/registration)
+
+### Menu
+`GET` [/preferences](http://menufi-192821.appspot.com/preferences)
+
+`GET` [/restaurants/{restaurantId}/items](http://menufi-192821.appspot.com/restaurants/1/items)
+
+`POST` [/restaurants/{restaurantId}/items](http://menufi-192821.appspot.com/restaurants/1/items)
+
+`GET` [/restaurants/{restaurantId}/items/{menuItemId}](http://menufi-192821.appspot.com/restaurants/1/items/5)
+
+`PUT` [/restaurants/{restaurantId}/items/{menuItemId}](http://menufi-192821.appspot.com/restaurants/1/items/5)
+
+### Metrics
+`GET` [/restaurants/{restaurantId}/items/{menuItemId}/clicks](http://menufi-192821.appspot.com/restaurants/1/items/5/clicks)
+
+`POST` [/restaurants/{restaurantId}/items/{menuItemId}/clicks](http://menufi-192821.appspot.com/restaurants/1/items/5/clicks)
+
+### Rating
+`GET` [/items/{menuItemId}/rating](http://menufi-192821.appspot.com/items/5/rating)
+
+`GET` [/items/{menuItemId}/rating/0](http://menufi-192821.appspot.com/items/5/rating/0)
+
+`PUT` [/items/{menuItemId}/rating/0](http://menufi-192821.appspot.com/items/5/rating/0)
+
+### restaurant
+`GET` [items/restaurants](http://menufi-192821.appspot.com/restaurants)
