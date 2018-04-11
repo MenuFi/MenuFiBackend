@@ -1,6 +1,7 @@
 package com.menufi.backend.springboot.restaurant;
 
 import com.google.common.collect.ImmutableList;
+import com.menufi.backend.springboot.login.LoginService;
 import com.menufi.backend.springboot.sql.Querier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,11 @@ public class RestaurantService {
     @Autowired
     private Querier querier;
 
-    public Collection<Restaurant> getRestaurants() {
+    private LoginService loginService;
+
+    public Collection<Restaurant> getRestaurants(String token) {
+        int userId = loginService.authenticateToken(token);
+
         Collection<Restaurant> restaurants = new ArrayList<Restaurant>();
         List<Map<String, String>> result = querier.query(RESTAURANT_TABLE, RESTAURANT_DATA_COLUMNS);
         if (!result.isEmpty()) {
