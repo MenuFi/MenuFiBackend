@@ -1,6 +1,8 @@
 package com.menufi.backend.springboot.menu;
 
 import com.google.common.collect.ImmutableList;
+import com.menufi.backend.springboot.metrics.MenuItemClick;
+import com.menufi.backend.springboot.metrics.MetricsService;
 import com.menufi.backend.springboot.sql.Querier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,9 @@ public class MenuService {
 
     @Autowired
     private Querier querier;
+
+    @Autowired
+    private MetricsService metricsService;
 
     public boolean updateMenuItemRating(int menuItemId, double newRating) {
         Map<String, String> updateValues = new HashMap<>();
@@ -119,7 +124,7 @@ public class MenuService {
         List<Map<String, String>> result = querier.queryWhere(MENU_TABLE, GET_ITEM_COLUMNS, whereClause);
 
         if (!result.isEmpty()) {
-            MenuItem mappedMenuItem = MenuService.translateToMenuItem(result.get(0));
+            MenuItem mappedMenuItem = MenuService.translateToMenuItem(result.get(0), 1);
             if (mappedMenuItem != null) {
                 mappedMenuItem.setIngredients(getIngredients(mappedMenuItem.getMenuItemId()));
                 mappedMenuItem.setDietaryPreferences(getDietaryPreferences(mappedMenuItem.getMenuItemId()));
@@ -130,19 +135,26 @@ public class MenuService {
     }
 
     public Collection<MenuItem> getAllMenuItems(int restaurantId) {
-        Collection<MenuItem> allMenuItems = new ArrayList<>();
+        List<MenuItem> allMenuItems = new ArrayList<>();
 
         Map<String, String> whereClause = new HashMap<>();
         whereClause.put("RestaurantId", Integer.toString(restaurantId));
 
         List<Map<String, String>> result = querier.queryWhere(MENU_TABLE, GET_ITEM_COLUMNS, whereClause);
         for (Map<String, String> entry : result) {
-            MenuItem mappedMenuItem = MenuService.translateToMenuItem(entry);
+            MenuItem mappedMenuItem = MenuService.translateToMenuItem(entry, 0);
+            Collection<MenuItemClick> clicks = metricsService.getMenuItemClicks(mappedMenuItem.getMenuItemId());
+            mappedMenuItem.setPopularity(clicks.size());
             if (mappedMenuItem != null) {
                 mappedMenuItem.setIngredients(getIngredients(mappedMenuItem.getMenuItemId()));
                 mappedMenuItem.setDietaryPreferences(getDietaryPreferences(mappedMenuItem.getMenuItemId()));
                 allMenuItems.add(mappedMenuItem);
             }
+        }
+        Collections.sort(allMenuItems);
+        Collections.reverse(allMenuItems);
+        for (int i = 0; i < allMenuItems.size(); i += 1) {
+            allMenuItems.get(i).setPopularity(i + 1);
         }
         return allMenuItems;
     }
@@ -241,7 +253,7 @@ public class MenuService {
         return updateMenuItemValues;
     }
 
-    public static MenuItem translateToMenuItem(Map<String, String> entry) {
+    public static MenuItem translateToMenuItem(Map<String, String> entry, int popularity) {
         boolean canTranslate = true;
         for (String column : GET_ITEM_COLUMNS) {
             canTranslate = canTranslate && entry.containsKey(column);
@@ -254,7 +266,8 @@ public class MenuService {
                 Integer.parseInt(entry.get("Calories")),
                 entry.get("Description"),
                 Double.parseDouble(entry.get("Rating")),
-                entry.get("PictureUri")
+                entry.get("PictureUri"),
+                popularity
         );
     }
 
