@@ -30,6 +30,14 @@ public class MenuService {
     @Autowired
     private Querier querier;
 
+    public boolean updateMenuItemRating(int menuItemId, double newRating) {
+        Map<String, String> updateValues = new HashMap<>();
+        updateValues.put("Rating", Double.toString(newRating));
+        Map<String, String> whereClause = new HashMap<>();
+        whereClause.put("MenuItemId", Integer.toString(menuItemId));
+        return querier.update(MENU_TABLE, updateValues, whereClause);
+    }
+
     public boolean updateMenuItem(int restaurantId, int menuItemId, MenuItem menuItem) {
         Map<String, String> updateValues = MenuService.translateFromMenuItemForUpdate(menuItem);
         Map<String, String> whereClause = new HashMap<>();

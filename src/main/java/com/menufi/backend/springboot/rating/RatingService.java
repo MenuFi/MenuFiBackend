@@ -2,6 +2,7 @@ package com.menufi.backend.springboot.rating;
 
 import com.google.common.collect.ImmutableList;
 import com.menufi.backend.springboot.login.LoginService;
+import com.menufi.backend.springboot.menu.MenuService;
 import com.menufi.backend.springboot.sql.Querier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,9 @@ public class RatingService {
     @Autowired
     private LoginService loginService;
 
+    @Autowired
+    private MenuService menuService;
+
     public boolean putMenuItemRating(int menuItemId, String token, double rating) {
         int userId = loginService.authenticateToken(token);
         Map<String, String> deleteWhere = new HashMap<>();
@@ -37,7 +41,12 @@ public class RatingService {
         values.put("MenuItemId", Integer.toString(menuItemId));
         values.put("UserId", Integer.toString(userId));
         values.put("Rating", Double.toString(rating));
-        return querier.insert(RATING_ITEM_TABLE, values);
+        if (querier.insert(RATING_ITEM_TABLE, values)) {
+            double newRating = getMenuItemRatingAverage(menuItemId);
+            menuService.updateMenuItemRating(menuItemId, newRating);
+            return true;
+        }
+        return false;
     }
 
     public MenuItemRating getMenuItemRating(int menuItemId, String token) {
