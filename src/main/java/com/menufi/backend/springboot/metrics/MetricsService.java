@@ -1,6 +1,7 @@
 package com.menufi.backend.springboot.metrics;
 
 import com.google.common.collect.ImmutableList;
+import com.menufi.backend.springboot.login.LoginService;
 import com.menufi.backend.springboot.menu.MenuItem;
 import com.menufi.backend.springboot.menu.MenuService;
 import com.menufi.backend.springboot.sql.Querier;
@@ -16,6 +17,9 @@ public class MetricsService {
 
     @Autowired
     private Querier querier;
+
+    @Autowired
+    private LoginService loginService;
 
     private static final String MENU_METRICS_TABLE = "menu_item_clicks";
     private static final List<String> GET_MENU_METRICS_COLUMNS = ImmutableList.of("MenuItemClickId", "MenuItemId", "Timestamp", "UserId");
@@ -35,9 +39,9 @@ public class MetricsService {
         return allMenuItemClicks;
     }
 
-    public int addMenuItemClick(AddMenuItemClickRequest addMenuItemClickRequest) {
-        // TODO: Implement
-        if (querier.insert(MENU_METRICS_TABLE, MetricsService.translateFromAddRequest(addMenuItemClickRequest))) {
+    public int addMenuItemClick(int menuItemId, String userToken) {
+        int userId = loginService.authenticateToken(userToken);
+        if (querier.insert(MENU_METRICS_TABLE, MetricsService.translateFromAddRequest(new AddMenuItemClickRequest(menuItemId, userId)))) {
             List<Map<String, String>> result = querier.query(MENU_METRICS_TABLE, ImmutableList.of("MenuItemClickId"));
             if (!result.isEmpty()) {
                 int newMenuItemClickId = Integer.parseInt(result.get(result.size()-1).get("MenuItemClickId"));
