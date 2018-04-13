@@ -42,8 +42,8 @@ public class RatingService {
         values.put("UserId", Integer.toString(userId));
         values.put("Rating", Double.toString(rating));
         if (querier.insert(RATING_ITEM_TABLE, values)) {
-            double newRating = getMenuItemRatingAverage(menuItemId);
-            menuService.updateMenuItemRating(menuItemId, newRating);
+            double newRating = getMenuItemRatingAverage(menuItemId, token);
+            menuService.updateMenuItemRating(menuItemId, token, newRating);
             return true;
         }
         return false;
@@ -64,7 +64,8 @@ public class RatingService {
         return null;
     }
 
-    public double getMenuItemRatingAverage(int menuItemId) {
+    public double getMenuItemRatingAverage(int menuItemId, String token) {
+        int userId = loginService.authenticateToken(token);
         Map<String, String> whereClause = new HashMap<>();
         whereClause.put("MenuItemId", Integer.toString(menuItemId));
         List<Map<String, String>> result = querier.queryWhere(RATING_ITEM_TABLE, RATING_ITEM_COLUMNS, whereClause);

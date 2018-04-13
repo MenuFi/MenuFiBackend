@@ -22,12 +22,23 @@ public class MetricsController {
 
     @CrossOrigin
     @RequestMapping(method= RequestMethod.GET, value="/restaurants/{restaurantId}/items/{menuItemId}/clicks", produces= MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CustomResponse<Collection<DietaryPreference>>> getAllItemClicks(@PathVariable int restaurantId, @PathVariable int menuItemId) {
-        Collection<MenuItemClick> menuItemClicks = metricsService.getMenuItemClicks(menuItemId);
-        if (menuItemClicks != null) {
-            return new ResponseEntity(new SuccessResponse<>(menuItemClicks), HttpStatus.OK);
+    public ResponseEntity<CustomResponse<Collection<DietaryPreference>>> getAllItemClicks(@PathVariable int restaurantId, @PathVariable int menuItemId, @RequestHeader("Authorization") String auth) {
+        String userToken = RestUtil.parseAuthHeader(auth);
+        if (userToken != null) {
+            try {
+                Collection<MenuItemClick> menuItemClicks = metricsService.getMenuItemClicks(menuItemId, userToken);
+                if (menuItemClicks != null) {
+                    return new ResponseEntity(new SuccessResponse<>(menuItemClicks), HttpStatus.OK);
+                }
+                return new ResponseEntity(new ErrorResponse(menuItemClicks), HttpStatus.BAD_REQUEST);
+            } catch (InvalidCredentialsException e) {
+                return new ResponseEntity(new ErrorResponse<>(e), HttpStatus.UNAUTHORIZED);
+            }
+
+        } else {
+            return new ResponseEntity(new ErrorResponse(null, "Improperly formatted token."), HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity(new ErrorResponse(menuItemClicks), HttpStatus.BAD_REQUEST);
+
     }
 
     @CrossOrigin
@@ -52,7 +63,7 @@ public class MetricsController {
                 return new ResponseEntity<>(new ErrorResponse<>(e), HttpStatus.UNAUTHORIZED);
             }
         } else {
-            return new ResponseEntity<>(new ErrorResponse<>(null, "Improperly formatted token"), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new ErrorResponse<>(null, "Improperly formatted token."), HttpStatus.UNAUTHORIZED);
         }
     }
 }

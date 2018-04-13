@@ -1,7 +1,6 @@
 package com.menufi.backend.springboot.menu;
 
 import com.google.common.collect.ImmutableList;
-import com.menufi.backend.springboot.RestUtil;
 import com.menufi.backend.springboot.login.LoginService;
 import com.menufi.backend.springboot.metrics.MenuItemClick;
 import com.menufi.backend.springboot.metrics.MetricsService;
@@ -46,7 +45,6 @@ public class MenuService {
         updateValues.put("Rating", Double.toString(newRating));
         Map<String, String> whereClause = new HashMap<>();
         whereClause.put("MenuItemId", Integer.toString(menuItemId));
-        whereClause.put("UserId", Integer.toString(userId));
         return querier.update(MENU_TABLE, updateValues, whereClause);
     }
 
@@ -56,10 +54,9 @@ public class MenuService {
         Map<String, String> whereClause = new HashMap<>();
         whereClause.put("RestaurantId", Integer.toString(restaurantId));
         whereClause.put("MenuItemId", Integer.toString(menuItemId));
-        whereClause.put("UserId", Integer.toString(userId));
         if (querier.update(MENU_TABLE, updateValues, whereClause)) {
             if (updateIngredients(menuItem.getIngredients(), menuItemId)) {
-                return updateDietaryPreferences(menuItem.getDietaryPreferences(), menuItemId);
+                return updateDietaryPreferences(menuItem.getDietaryPreferences(), menuItemId, token);
             }
         }
         return false;
@@ -74,11 +71,11 @@ public class MenuService {
         return false;
     }
 
-    public boolean updateDietaryPreferences(int[] dietaryPreferences, int menuItemId) {
+    public boolean updateDietaryPreferences(int[] dietaryPreferences, int menuItemId, String token) {
         Map<String, String> deleteWhere = new HashMap<>();
         deleteWhere.put("MenuItemId", Integer.toString(menuItemId));
         if (querier.delete(PREFERENCES_MAPPING_TABLE, deleteWhere)) {
-            return addDietaryPreferences(dietaryPreferences, menuItemId);
+            return addDietaryPreferences(dietaryPreferences, menuItemId, token);
         }
         return false;
     }
@@ -92,9 +89,9 @@ public class MenuService {
         return succeeded;
     }
 
-    public boolean addDietaryPreferences(int[] dietaryPreferences, int menuItemId) {
+    public boolean addDietaryPreferences(int[] dietaryPreferences, int menuItemId, String token) {
         boolean succeeded = true;
-        List<DietaryPreference> allDietaryPreferences = getAllDietaryPreferences();
+        List<DietaryPreference> allDietaryPreferences = getAllDietaryPreferences(token);
         List<Integer> validPreferences = new ArrayList<>();
         for (int preferenceId : dietaryPreferences) {
             try (Stream<DietaryPreference> allDietaryPreferencesStream = allDietaryPreferences.stream()) {
@@ -114,13 +111,13 @@ public class MenuService {
     }
 
     public int addMenuItem(AddMenuItemRequest addMenuItemRequest, String token) {
-        String userId = RestUtil.parseAuthHeader(token);
-        if (querier.insert(MENU_TABLE, MenuService.translateFromAddRequest(addMenuItemRequest)) && userId != null) {
+        int userId = loginService.authenticateToken(token);
+        if (querier.insert(MENU_TABLE, MenuService.translateFromAddRequest(addMenuItemRequest))) {
             List<Map<String, String>> result = querier.query(MENU_TABLE, ImmutableList.of("MenuItemId"));
             if (!result.isEmpty()) {
                 int newMenuItemId = Integer.parseInt(result.get(result.size() - 1).get("MenuItemId"));
                 addIngredients(addMenuItemRequest.getIngredients(), newMenuItemId);
-                addDietaryPreferences(addMenuItemRequest.getDietaryPreferences(), newMenuItemId);
+                addDietaryPreferences(addMenuItemRequest.getDietaryPreferences(), newMenuItemId, token);
                 return newMenuItemId;
             }
         }
@@ -133,7 +130,6 @@ public class MenuService {
         Map<String, String> whereClause = new HashMap<>();
         whereClause.put("RestaurantId", Integer.toString(restaurantId));
         whereClause.put("MenuItemId", Integer.toString(menuItemId));
-        whereClause.put("UserId", Integer.toString(userId));
 
         List<Map<String, String>> result = querier.queryWhere(MENU_TABLE, GET_ITEM_COLUMNS, whereClause);
 
@@ -148,7 +144,8 @@ public class MenuService {
         return null;
     }
 
-    public Collection<MenuItem> getAllMenuItems(int restaurantId) {
+    public Collection<MenuItem> getAllMenuItems(int restaurantId, String token) {
+        int userId = loginService.authenticateToken(token);
         List<MenuItem> allMenuItems = new ArrayList<>();
 
         Map<String, String> whereClause = new HashMap<>();
@@ -157,7 +154,7 @@ public class MenuService {
         List<Map<String, String>> result = querier.queryWhere(MENU_TABLE, GET_ITEM_COLUMNS, whereClause);
         for (Map<String, String> entry : result) {
             MenuItem mappedMenuItem = MenuService.translateToMenuItem(entry, 0);
-            Collection<MenuItemClick> clicks = metricsService.getMenuItemClicks(mappedMenuItem.getMenuItemId());
+            Collection<MenuItemClick> clicks = metricsService.getMenuItemClicks(mappedMenuItem.getMenuItemId(), token);
             mappedMenuItem.setPopularity(clicks.size());
             if (mappedMenuItem != null) {
                 mappedMenuItem.setIngredients(getIngredients(mappedMenuItem.getMenuItemId()));
@@ -210,7 +207,8 @@ public class MenuService {
         return resultPreferences;
     }
 
-    public List<DietaryPreference> getAllDietaryPreferences() {
+    public List<DietaryPreference> getAllDietaryPreferences(String token) {
+        int userId = loginService.authenticateToken(token);
         List<DietaryPreference> allDietaryPreferences = new ArrayList<>();
         List<Map<String, String>> result = querier.query(PREFERENCES_TABLE, GET_PREFERENCES_COLUMNS);
         for (Map<String, String> entry : result) {

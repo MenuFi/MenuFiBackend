@@ -24,8 +24,8 @@ public class MetricsService {
     private static final String MENU_METRICS_TABLE = "menu_item_clicks";
     private static final List<String> GET_MENU_METRICS_COLUMNS = ImmutableList.of("MenuItemClickId", "MenuItemId", "Timestamp", "UserId");
 
-    public Collection<MenuItemClick> getMenuItemClicks(int menuItemId) {
-        // TODO: Implement
+    public Collection<MenuItemClick> getMenuItemClicks(int menuItemId, String token) {
+        int userId = loginService.authenticateToken(token);
         Collection<MenuItemClick> allMenuItemClicks = new ArrayList<>();
         Map<String, String> whereClause = new HashMap<>();
         whereClause.put("MenuItemId", Integer.toString(menuItemId));
@@ -66,7 +66,6 @@ public class MetricsService {
 
     public static Map<String, String> translateFromAddRequest(AddMenuItemClickRequest addMenuItemClickRequest) {
         Map<String, String> addMenuItemClickValues = new HashMap<>();
-//        addMenuItemClickValues.put("MenuItemClickId", Integer.toString(addMenuItemClickRequest.getMenuItemClickId()));
         addMenuItemClickValues.put("MenuItemId", Integer.toString(addMenuItemClickRequest.getMenuItemId()));
         addMenuItemClickValues.put("UserId", Integer.toString(addMenuItemClickRequest.getUserId()));
         return addMenuItemClickValues;

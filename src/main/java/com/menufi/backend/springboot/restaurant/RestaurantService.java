@@ -18,13 +18,11 @@ public class RestaurantService {
     @Autowired
     private Querier querier;
 
+    @Autowired
     private LoginService loginService;
 
     public Collection<Restaurant> getRestaurants(String token) {
         int userId = loginService.authenticateToken(token);
-
-        Map<String, String> whereClause = new HashMap<>();
-        whereClause.put("UserId", Integer.toString(userId));
 
         Collection<Restaurant> restaurants = new ArrayList<Restaurant>();
         List<Map<String, String>> result = querier.query(RESTAURANT_TABLE, RESTAURANT_DATA_COLUMNS);

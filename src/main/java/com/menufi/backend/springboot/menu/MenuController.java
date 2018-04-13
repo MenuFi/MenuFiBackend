@@ -5,6 +5,7 @@ import com.menufi.backend.springboot.ErrorResponse;
 import com.menufi.backend.springboot.RestUtil;
 import com.menufi.backend.springboot.SuccessResponse;
 import com.menufi.backend.springboot.login.InvalidCredentialsException;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,14 +24,33 @@ public class MenuController {
 
     @CrossOrigin
     @RequestMapping(method= RequestMethod.GET, value="/preferences", produces= MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CustomResponse<Collection<DietaryPreference>>> getAllDietaryPreferences() {
-        return new ResponseEntity<>(new SuccessResponse<>(menuService.getAllDietaryPreferences()), HttpStatus.OK);
+    public ResponseEntity<CustomResponse<Collection<DietaryPreference>>> getAllDietaryPreferences(@RequestHeader("Authorization") String auth) {
+        String userToken = RestUtil.parseAuthHeader(auth);
+        if (userToken != null) {
+            try {
+                return new ResponseEntity<>(new SuccessResponse<>(menuService.getAllDietaryPreferences(userToken)), HttpStatus.OK);
+            } catch (InvalidCredentialsException e) {
+                return new ResponseEntity<>(new ErrorResponse<>(e), HttpStatus.UNAUTHORIZED);
+            }
+        } else {
+            return new ResponseEntity<>(new ErrorResponse<>(null, "Improperly formatted token."), HttpStatus.UNAUTHORIZED);
+        }
+
     }
 
     @CrossOrigin
     @RequestMapping(method= RequestMethod.GET, value="/restaurants/{restaurantId}/items", produces= MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CustomResponse<Collection<MenuItem>>> getAllMenuItems(@PathVariable int restaurantId) {
-        return new ResponseEntity<>(new SuccessResponse<>(menuService.getAllMenuItems(restaurantId)), HttpStatus.OK);
+    public ResponseEntity<CustomResponse<Collection<MenuItem>>> getAllMenuItems(@PathVariable int restaurantId, @RequestHeader("Authorization") String auth) {
+        String userToken = RestUtil.parseAuthHeader(auth);
+        if (userToken != null) {
+            try {
+                return new ResponseEntity<>(new SuccessResponse<>(menuService.getAllMenuItems(restaurantId, userToken)), HttpStatus.OK);
+            } catch (InvalidCredentialsException e) {
+                return new ResponseEntity<>(new ErrorResponse<>(e), HttpStatus.UNAUTHORIZED);
+            }
+        } else {
+            return new ResponseEntity<>(new ErrorResponse<>(null, "Improperly formatted token."), HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @CrossOrigin
@@ -48,7 +68,6 @@ public class MenuController {
                 return new ResponseEntity(new ErrorResponse(e), HttpStatus.UNAUTHORIZED);
             }
         }
-        // else if the userToken == null
         return new ResponseEntity(new ErrorResponse<>(false, "Improperly formatted token."), HttpStatus.UNAUTHORIZED);
 
     }
@@ -65,10 +84,10 @@ public class MenuController {
                 }
                 return new ResponseEntity<>(new ErrorResponse<>(false), HttpStatus.BAD_REQUEST);
             } catch (InvalidCredentialsException e) {
-                return new ResponseEntity(new ErrorResponse(e), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity(new ErrorResponse(e), HttpStatus.UNAUTHORIZED);
             }
         }
-        return new ResponseEntity(new ErrorResponse<>(false, "Improprely formatted token. "), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity(new ErrorResponse<>(false, "Improperly formatted token. "), HttpStatus.UNAUTHORIZED);
 
 
     }

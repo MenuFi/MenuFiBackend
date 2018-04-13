@@ -25,7 +25,7 @@ public class RestaurantController {
         String userToken = RestUtil.parseAuthHeader(auth);
         if (userToken != null) {
             try {
-                return new ResponseEntity<>(new SuccessResponse<>(restaurantService.getRestaurants(auth)), HttpStatus.OK);
+                return new ResponseEntity<>(new SuccessResponse<>(restaurantService.getRestaurants(userToken)), HttpStatus.OK);
             } catch (InvalidCredentialsException e) {
                 return new ResponseEntity<>(new ErrorResponse<>(e), HttpStatus.UNAUTHORIZED);
             }

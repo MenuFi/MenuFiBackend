@@ -68,9 +68,19 @@ public class RatingController {
 
     @CrossOrigin
     @RequestMapping(method=RequestMethod.GET, value="/items/{menuItemId}/rating", produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CustomResponse<Double>> getMenuItemRatingAverage(@PathVariable int menuItemId) {
-        double averageRating = ratingService.getMenuItemRatingAverage(menuItemId);
-        return new ResponseEntity<>(new SuccessResponse<>(averageRating), HttpStatus.OK);
+    public ResponseEntity<CustomResponse<Double>> getMenuItemRatingAverage(@PathVariable int menuItemId, @RequestHeader("Authorization") String auth) {
+        String userToken = RestUtil.parseAuthHeader(auth);
+        if (userToken != null) {
+            try {
+                double averageRating = ratingService.getMenuItemRatingAverage(menuItemId, userToken);
+                return new ResponseEntity<>(new SuccessResponse<>(averageRating), HttpStatus.OK);
+            } catch (InvalidCredentialsException e) {
+                return new ResponseEntity(new ErrorResponse(e), HttpStatus.UNAUTHORIZED);
+            }
+        } else {
+            return new ResponseEntity(new ErrorResponse(null, "Improperly formatted token."), HttpStatus.UNAUTHORIZED);
+        }
+
     }
 
 }
