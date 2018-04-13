@@ -1,6 +1,8 @@
 package com.menufi.backend.springboot.menu;
 
 import com.google.common.collect.ImmutableList;
+import com.menufi.backend.springboot.RestUtil;
+import com.menufi.backend.springboot.login.LoginService;
 import com.menufi.backend.springboot.metrics.MenuItemClick;
 import com.menufi.backend.springboot.metrics.MetricsService;
 import com.menufi.backend.springboot.sql.Querier;
@@ -35,19 +37,26 @@ public class MenuService {
     @Autowired
     private MetricsService metricsService;
 
-    public boolean updateMenuItemRating(int menuItemId, double newRating) {
+    @Autowired
+    private LoginService loginService;
+
+    public boolean updateMenuItemRating(int menuItemId, String token, double newRating) {
+        int userId = loginService.authenticateToken(token);
         Map<String, String> updateValues = new HashMap<>();
         updateValues.put("Rating", Double.toString(newRating));
         Map<String, String> whereClause = new HashMap<>();
         whereClause.put("MenuItemId", Integer.toString(menuItemId));
+        whereClause.put("UserId", Integer.toString(userId));
         return querier.update(MENU_TABLE, updateValues, whereClause);
     }
 
-    public boolean updateMenuItem(int restaurantId, int menuItemId, MenuItem menuItem) {
+    public boolean updateMenuItem(int restaurantId, int menuItemId, String token, MenuItem menuItem) {
+        int userId = loginService.authenticateToken(token);
         Map<String, String> updateValues = MenuService.translateFromMenuItemForUpdate(menuItem);
         Map<String, String> whereClause = new HashMap<>();
         whereClause.put("RestaurantId", Integer.toString(restaurantId));
         whereClause.put("MenuItemId", Integer.toString(menuItemId));
+        whereClause.put("UserId", Integer.toString(userId));
         if (querier.update(MENU_TABLE, updateValues, whereClause)) {
             if (updateIngredients(menuItem.getIngredients(), menuItemId)) {
                 return updateDietaryPreferences(menuItem.getDietaryPreferences(), menuItemId);
@@ -104,8 +113,9 @@ public class MenuService {
         return succeeded;
     }
 
-    public int addMenuItem(AddMenuItemRequest addMenuItemRequest) {
-        if (querier.insert(MENU_TABLE, MenuService.translateFromAddRequest(addMenuItemRequest))) {
+    public int addMenuItem(AddMenuItemRequest addMenuItemRequest, String token) {
+        String userId = RestUtil.parseAuthHeader(token);
+        if (querier.insert(MENU_TABLE, MenuService.translateFromAddRequest(addMenuItemRequest)) && userId != null) {
             List<Map<String, String>> result = querier.query(MENU_TABLE, ImmutableList.of("MenuItemId"));
             if (!result.isEmpty()) {
                 int newMenuItemId = Integer.parseInt(result.get(result.size() - 1).get("MenuItemId"));
@@ -117,10 +127,14 @@ public class MenuService {
         return -1;
     }
 
-    public MenuItem getMenuItem(int restaurantId, int menuItemId) {
+    public MenuItem getMenuItem(int restaurantId, int menuItemId, String token) {
+        int userId = loginService.authenticateToken(token);
+
         Map<String, String> whereClause = new HashMap<>();
         whereClause.put("RestaurantId", Integer.toString(restaurantId));
         whereClause.put("MenuItemId", Integer.toString(menuItemId));
+        whereClause.put("UserId", Integer.toString(userId));
+
         List<Map<String, String>> result = querier.queryWhere(MENU_TABLE, GET_ITEM_COLUMNS, whereClause);
 
         if (!result.isEmpty()) {
