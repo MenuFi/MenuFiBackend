@@ -91,7 +91,7 @@ public class MenuService {
 
     public boolean addDietaryPreferences(int[] dietaryPreferences, int menuItemId, String token) {
         boolean succeeded = true;
-        List<DietaryPreference> allDietaryPreferences = getAllDietaryPreferences(token);
+        List<DietaryPreference> allDietaryPreferences = getAllDietaryPreferences();
         List<Integer> validPreferences = new ArrayList<>();
         for (int preferenceId : dietaryPreferences) {
             try (Stream<DietaryPreference> allDietaryPreferencesStream = allDietaryPreferences.stream()) {
@@ -207,8 +207,7 @@ public class MenuService {
         return resultPreferences;
     }
 
-    public List<DietaryPreference> getAllDietaryPreferences(String token) {
-        int userId = loginService.authenticateToken(token);
+    public List<DietaryPreference> getAllDietaryPreferences() {
         List<DietaryPreference> allDietaryPreferences = new ArrayList<>();
         List<Map<String, String>> result = querier.query(PREFERENCES_TABLE, GET_PREFERENCES_COLUMNS);
         for (Map<String, String> entry : result) {
