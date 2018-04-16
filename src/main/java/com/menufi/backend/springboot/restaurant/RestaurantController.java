@@ -33,4 +33,34 @@ public class RestaurantController {
             return new ResponseEntity<>(new ErrorResponse<>(null, "Improperly formatted token"), HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @CrossOrigin
+    @RequestMapping(method= RequestMethod.GET, value="/restaurants/id", produces= MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CustomResponse<Integer>> getRestaurantId(@RequestHeader("Authorization") String auth) {
+        String userToken = RestUtil.parseAuthHeader(auth);
+        if (userToken != null) {
+            try {
+                return new ResponseEntity<>(new SuccessResponse<>(restaurantService.getRestaurantId(userToken)), HttpStatus.OK);
+            } catch (InvalidCredentialsException e) {
+                return new ResponseEntity<>(new ErrorResponse<>(e), HttpStatus.UNAUTHORIZED);
+            }
+        } else {
+            return new ResponseEntity<>(new ErrorResponse<>(null, "Improperly formatted token"), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @CrossOrigin
+    @RequestMapping(method= RequestMethod.POST, value="/restaurants", produces= MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CustomResponse<Integer>> addRestaurant(@RequestBody AddRestaurantRequest body, @RequestHeader("Authorization") String auth) {
+        String userToken = RestUtil.parseAuthHeader(auth);
+        if (userToken != null) {
+            try {
+                return new ResponseEntity<>(new SuccessResponse<>(restaurantService.addRestaurant(body, userToken)), HttpStatus.OK);
+            } catch (InvalidCredentialsException e) {
+                return new ResponseEntity<>(new ErrorResponse<>(e), HttpStatus.UNAUTHORIZED);
+            }
+        } else {
+            return new ResponseEntity<>(new ErrorResponse<>(null, "Improperly formatted token"), HttpStatus.UNAUTHORIZED);
+        }
+    }
 }

@@ -21,6 +21,25 @@ public class RestaurantService {
     @Autowired
     private LoginService loginService;
 
+    public int getRestaurantId(String userToken) {
+        return loginService.authenticateToken(userToken);
+    }
+
+    public int addRestaurant(AddRestaurantRequest request, String userToken) {
+        int userId = loginService.authenticateToken(userToken);
+        Map<String, String> insertValues = new HashMap<>();
+        insertValues.put("RestaurantId", Integer.toString(userId));
+        insertValues.put("Name", request.getName());
+        insertValues.put("Price", Double.toString(request.getPrice()));
+        insertValues.put("PictureUri", request.getPictureUri());
+
+        if (querier.insert(RESTAURANT_TABLE, insertValues)) {
+            return userId;
+        } else {
+            return -1;
+        }
+    }
+
     public Collection<Restaurant> getRestaurants(String token) {
         int userId = loginService.authenticateToken(token);
 
