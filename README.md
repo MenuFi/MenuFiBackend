@@ -2,6 +2,17 @@
 ## Entry Point
 com.menufi.backend.springboot.MenuFiSpringBootApplication
 
+## Installation
+### MACOS 10.12.6
+Prerequisite: Homebrew, Gradle, MySQL, Java, Google App Engine
+1. Clone the github repo to your local host: 
+> git clone https://github.com/MenuFi/MenuFiBackend.git
+2. Redirect to the repo directory and: 
+> build gradle
+3. Run the backend local: 
+> gradle appengineRun
+
+
 ## Configuration
 Edit `spring.profiles.active` property in _src/main/resources/application.properties_ to either:
 * `default` (uses `CloudSqlQuerier`)
