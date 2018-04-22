@@ -2,6 +2,17 @@
 ## Entry Point
 com.menufi.backend.springboot.MenuFiSpringBootApplication
 
+## RELEASE NOTES v1.0
+### NEW FEATURES
+
+* Added controllers services for web and android apps. 
+* Added authentication of requests
+
+### BUG FIXES:
+
+* Disallow unautorized connections
+
+
 ## Install Guide
 ### Prerequisite
 You must have following softwares installed on your host before proceeding: 
