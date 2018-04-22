@@ -9,7 +9,7 @@ Prerequisite: Homebrew, Gradle, MySQL, Java, Google App Engine
 > git clone https://github.com/MenuFi/MenuFiBackend.git
 2. Redirect to the repo directory and: 
 > build gradle
-3. Run the backend local: 
+3. Run the backend locally: 
 > gradle appengineRun
 
 
