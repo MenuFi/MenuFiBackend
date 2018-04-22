@@ -2,15 +2,36 @@
 ## Entry Point
 com.menufi.backend.springboot.MenuFiSpringBootApplication
 
-## Installation
-### MACOS 10.12.6
-Prerequisite: Homebrew, Gradle, MySQL, Java, Google App Engine
-1. Clone the github repo to your local host: 
+## Install Guide
+### Prerequisite
+You must have following softwares installed on your host before proceeding: 
+1. Gradle
+2. Java
+3. Google App Engine
+4. MYSQL
+5. (optional but highly recommended if your host is MACOS) Homebrew
+
+### DOWNLOAD:
+1. Go the directory that you want to put MenuFiBackend package. 
+2. Clone the package:
 > git clone https://github.com/MenuFi/MenuFiBackend.git
-2. Redirect to the repo directory and: 
+
+### DEPENDENCIES
+
+All other dependencies are resolved in build.gradle file. 
+
+### INSTALLATION
+
+Run the following command in the shell under the directory of your package: 
 > build gradle
-3. Run the backend locally: 
+
+### RUN
+
+On a local host, run the following command in the shell under the directory of your package: 
 > gradle appengineRun
+
+To run on remote services like google app engine, set up your google appengine account on your host and run the following command: 
+> gradle appengineDeploy
 
 
 ## Configuration
